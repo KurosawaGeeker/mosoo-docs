@@ -5,6 +5,11 @@
   "colors": {
     "primary": "#0F6B45"
   },
+  "api": {
+    "examples": {
+      "prefill": true
+    }
+  },
   "navigation": {
     "groups": [
       {

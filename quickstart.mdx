@@ -22,6 +22,9 @@ export GROOTS_PAT="grt_pat_..."
 export GROOTS_AGENT_ID="your-published-agent-id"
 ```
 
+If you opened this page from an Agent's API Access panel, the URL contains
+`agentId`. Use that value for `GROOTS_AGENT_ID`.
+
 ## 2. Create a session
 
 ```bash
@@ -58,3 +61,4 @@ curl "https://groots.ai/api/v1/sessions/$GROOTS_SESSION_ID/events" \
 - The Agent must be published.
 - The caller must still pass Organization membership and Agent access checks.
 - The Agent executes under the Agent owner's configured access boundary.
+- API Reference examples use placeholder IDs. Replace them with the Agent ID and session ID from Groots before pressing Try it.
