@@ -1,0 +1,58 @@
+---
+title: "Quickstart"
+description: "Call a published Groots Agent with curl."
+---
+
+# Quickstart
+
+## 1. Create a Personal Access Token
+
+In Groots, open:
+
+```text
+/settings/access-tokens
+```
+
+Create a token and copy it once. Store it as an environment variable:
+
+```bash
+export GROOTS_PAT="grt_pat_..."
+export GROOTS_AGENT_ID="your-published-agent-id"
+```
+
+## 2. Create a session
+
+```bash
+curl -X POST "https://groots.ai/api/v1/agents/$GROOTS_AGENT_ID/sessions" \
+  -H "Authorization: Bearer $GROOTS_PAT" \
+  -H "Content-Type: application/json"
+```
+
+Copy `session.id` from the response:
+
+```bash
+export GROOTS_SESSION_ID="session-id-from-response"
+```
+
+## 3. Send a user message
+
+```bash
+curl -X POST "https://groots.ai/api/v1/sessions/$GROOTS_SESSION_ID/events" \
+  -H "Authorization: Bearer $GROOTS_PAT" \
+  -H "Content-Type: application/json" \
+  -d '{"events":[{"type":"user_message","text":"Say hello"}]}'
+```
+
+## 4. Replay runtime events
+
+```bash
+curl "https://groots.ai/api/v1/sessions/$GROOTS_SESSION_ID/events" \
+  -H "Authorization: Bearer $GROOTS_PAT"
+```
+
+## Notes
+
+- A valid PAT does not unlock every Agent.
+- The Agent must be published.
+- The caller must still pass Organization membership and Agent access checks.
+- The Agent executes under the Agent owner's configured access boundary.

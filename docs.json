@@ -1,0 +1,20 @@
+{
+  "$schema": "https://mintlify.com/docs.json",
+  "theme": "mint",
+  "name": "Groots API",
+  "colors": {
+    "primary": "#0F6B45"
+  },
+  "navigation": {
+    "groups": [
+      {
+        "group": "Get started",
+        "pages": ["index", "quickstart"]
+      },
+      {
+        "group": "API Reference",
+        "openapi": "https://groots.ai/api/v1/openapi.json"
+      }
+    ]
+  }
+}
