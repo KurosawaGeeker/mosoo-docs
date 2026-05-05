@@ -7,12 +7,11 @@ description: "Create and drive sessions on published Groots Agents."
 
 The Groots Published Agent API lets approved callers create and drive sessions on published Agents.
 
-Use this documentation when you want to:
+This is the small public docs surface for M2D:
 
-- Create a session for a published Agent.
-- Send user messages, permission decisions, or interrupts.
-- Replay runtime events.
-- Manage SessionFiles attached to a session.
+- [Quickstart](/quickstart): create a session, send a message, and replay events with curl.
+- [Authentication and access](/auth-and-access): understand PAT caller identity, Agent access, and owner execution.
+- API Reference: generated from the live OpenAPI document.
 
 The API is PAT-authenticated and access-gated. A Personal Access Token identifies the caller account; Organization membership and Agent access decide whether that caller can use a specific Agent. Runtime execution still follows the Agent owner's configured access boundary.
 
@@ -23,5 +22,3 @@ This site generates its API reference from the live OpenAPI document:
 ```text
 https://groots.ai/api/v1/openapi.json
 ```
-
-Start with [Quickstart](/quickstart), then open the generated API Reference section.

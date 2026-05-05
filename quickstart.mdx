@@ -5,7 +5,9 @@ description: "Call a published Groots Agent with curl."
 
 # Quickstart
 
-## 1. Create a Personal Access Token
+Call a published Groots Agent in three steps: create a PAT, create a session, then send events to that session.
+
+## 1. Create a PAT
 
 In Groots, open:
 
@@ -43,7 +45,7 @@ curl -X POST "https://groots.ai/api/v1/sessions/$GROOTS_SESSION_ID/events" \
   -d '{"events":[{"type":"user_message","text":"Say hello"}]}'
 ```
 
-## 4. Replay runtime events
+## 4. Replay events
 
 ```bash
 curl "https://groots.ai/api/v1/sessions/$GROOTS_SESSION_ID/events" \

@@ -1,0 +1,47 @@
+---
+title: "Authentication and access"
+description: "How PAT identity, Organization membership, Agent access, and owner execution work."
+---
+
+# Authentication and access
+
+The Published Agent API separates caller admission from Agent execution.
+
+## PAT identity
+
+Use a Personal Access Token in the `Authorization` header:
+
+```bash
+Authorization: Bearer grt_pat_...
+```
+
+A PAT identifies the caller account. It does not carry per-Agent scopes, replace vendor credentials, or participate in BYOK decisions.
+
+## Admission checks
+
+Every request goes through these checks:
+
+1. The Agent exists.
+2. The Agent is published and has an active service endpoint.
+3. The PAT is valid and not revoked.
+4. The caller is an active member of the Agent's Organization.
+5. The caller is allowed by the Agent's access mode.
+
+## Agent access modes
+
+| Mode | Who can call |
+| --- | --- |
+| Organization-wide | Any active Organization member with a valid PAT. |
+| Invited-only | The Agent owner and explicitly invited collaborators. |
+
+Having a PAT is not enough. If the caller does not pass the Agent access gate, the API returns a forbidden error.
+
+## Owner execution
+
+The Agent executes under the Agent owner's configured access boundary.
+
+The caller is recorded for admission, attribution, and session ownership, but the caller does not become the runtime execution owner and cannot swap in their own vendor credentials.
+
+## Token lifecycle
+
+Create and revoke tokens at `/settings/access-tokens`. Revoking a token blocks future API requests from that token; it does not delete existing sessions.

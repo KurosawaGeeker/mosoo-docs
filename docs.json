@@ -8,8 +8,8 @@
   "navigation": {
     "groups": [
       {
-        "group": "Get started",
-        "pages": ["index", "quickstart"]
+        "group": "Start",
+        "pages": ["index", "quickstart", "auth-and-access"]
       },
       {
         "group": "API Reference",
