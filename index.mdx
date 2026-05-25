@@ -1,24 +1,26 @@
 ---
 title: "Groots API"
-description: "Create and drive sessions on published Groots Agents."
+description: "Submit tasks to published Groots Agents."
 ---
 
 # Groots API
 
-The Groots Published Agent API lets approved callers create and drive sessions on published Agents.
+The Groots Published Agent API lets approved callers submit tasks to published Agents.
 
 This is the small public docs surface for M2D:
 
-- [Quickstart](/quickstart): create a session, send a message, and replay events with curl.
-- [Authentication and access](/auth-and-access): understand PAT caller identity, Agent access, and owner execution.
+- [Quickstart](/quickstart): create a task, check its status, and continue with the Session API when needed.
+- [Authentication and access](/auth-and-access): understand Human PAT callers, Organization Service tokens, attribution, Agent access, and owner execution.
 - API Reference: generated from the live OpenAPI document.
 
-The API is PAT-authenticated and access-gated. A Personal Access Token identifies the caller account; Organization membership and Agent access decide whether that caller can use a specific Agent. Runtime execution still follows the Agent owner's configured access boundary.
+The default entry point is `POST /api/v1/agents/{agentId}/tasks`. Creating a task creates the backing Agent Session and the initial run. Advanced lifecycle controls, including sending follow-up events, retrieving session metadata, session files, archive, unarchive, and delete, stay on the lower-level Session API.
+
+The API is bearer-token authenticated and access-gated. A Human Personal Access Token identifies a human caller. An Organization Service token identifies a machine caller and can optionally project attribution to a human user when allowed. Runtime execution still follows the published Agent owner's configured access boundary.
 
 ## API source
 
 This site generates its API reference from the live OpenAPI document. Push a docs
-change after the API is deployed when the reference needs to be refreshed:
+change after the API is deployed when the reference text or quickstart needs to be refreshed:
 
 ```text
 https://groots.ai/api/v1/openapi.json

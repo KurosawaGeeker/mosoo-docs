@@ -5,9 +5,9 @@ description: "Call a published Groots Agent with curl."
 
 # Quickstart
 
-Call a published Groots Agent in three steps: create a PAT, create a session, then send events to that session.
+Call a published Groots Agent in three steps: create an API token, create a task, then check that task.
 
-## 1. Create a PAT
+## 1. Create an API token
 
 In Groots, open:
 
@@ -15,50 +15,82 @@ In Groots, open:
 /settings/access-tokens
 ```
 
-Create a token and copy it once. Store it as an environment variable:
+Create a Human Personal Access Token or use an Organization Service token that is allowed to call the published Agent. Copy the token once and store it as an environment variable:
 
 ```bash
-export GROOTS_PAT="grt_pat_..."
+export GROOTS_API_TOKEN="grt_pat_..."
 export GROOTS_AGENT_ID="your-published-agent-id"
 ```
 
 If you opened this page from an Agent's API Access panel, the URL contains
 `agentId`. Use that value for `GROOTS_AGENT_ID`.
 
-## 2. Create a session
+## 2. Create a task
 
 ```bash
-curl -X POST "https://groots.ai/api/v1/agents/$GROOTS_AGENT_ID/sessions" \
-  -H "Authorization: Bearer $GROOTS_PAT" \
-  -H "Content-Type: application/json"
-```
-
-Copy `session.id` from the response:
-
-```bash
-export GROOTS_SESSION_ID="session-id-from-response"
-```
-
-## 3. Send a user message
-
-```bash
-curl -X POST "https://groots.ai/api/v1/sessions/$GROOTS_SESSION_ID/events" \
-  -H "Authorization: Bearer $GROOTS_PAT" \
+curl -X POST "https://groots.ai/api/v1/agents/$GROOTS_AGENT_ID/tasks" \
+  -H "Authorization: Bearer $GROOTS_API_TOKEN" \
   -H "Content-Type: application/json" \
-  -d '{"events":[{"type":"user_message","text":"Say hello"}]}'
+  -H "Idempotency-Key: task-quickstart-001" \
+  -d '{
+    "input": {
+      "type": "user.message",
+      "content": [
+        { "type": "text", "text": "Say hello" }
+      ]
+    },
+    "client_external_ref": "quickstart-001"
+  }'
 ```
 
-## 4. Replay events
+Copy `task.id` from the response:
 
 ```bash
-curl "https://groots.ai/api/v1/sessions/$GROOTS_SESSION_ID/events" \
-  -H "Authorization: Bearer $GROOTS_PAT"
+export GROOTS_TASK_ID="task-id-from-response"
 ```
+
+The response also includes `session.id` and `run.id`. Use the session ID only when you need advanced continuation or session lifecycle controls.
+
+## 3. Check the task
+
+```bash
+curl "https://groots.ai/api/v1/tasks/$GROOTS_TASK_ID" \
+  -H "Authorization: Bearer $GROOTS_API_TOKEN"
+```
+
+If the task is waiting for user input, the response includes `task.next_action`. Continue in the Web Thread or with the Session API.
+
+## Attach files
+
+Create Task accepts File Service handles:
+
+```bash
+curl -X POST "https://groots.ai/api/v1/agents/$GROOTS_AGENT_ID/tasks" \
+  -H "Authorization: Bearer $GROOTS_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: task-file-example-001" \
+  -d '{
+    "input": {
+      "type": "user.message",
+      "content": [
+        { "type": "text", "text": "Summarize the attached launch plan." }
+      ]
+    },
+    "files": [
+      { "file_id": "file_..." }
+    ],
+    "client_external_ref": "launch-plan-review"
+  }'
+```
+
+After task creation, those file handles become Session Files on the new backing session.
 
 ## Notes
 
-- A valid PAT does not unlock every Agent.
+- A valid token does not unlock every Agent.
 - The Agent must be published.
-- The caller must still pass Organization membership and Agent access checks.
+- The caller must pass Organization membership, Agent access, and token allowlist checks.
 - The Agent executes under the Agent owner's configured access boundary.
-- API Reference examples use placeholder IDs. Replace them with the Agent ID and session ID from Groots before pressing Try it.
+- `Idempotency-Key` is the retry-safe create-task key. `client_external_ref` is only your business reference.
+- Session endpoints are advanced controls. They are useful for follow-up events, permission decisions, interrupts, session files, archive, unarchive, delete, and retrieve.
+- API Reference examples use placeholder IDs. Replace them with the Agent ID, task ID, file ID, or session ID from Groots before pressing Try it.

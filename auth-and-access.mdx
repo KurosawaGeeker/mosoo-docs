@@ -1,21 +1,23 @@
 ---
 title: "Authentication and access"
-description: "How PAT identity, Organization membership, Agent access, and owner execution work."
+description: "How Human PATs, Organization Service tokens, attribution, Agent access, and owner execution work."
 ---
 
 # Authentication and access
 
 The Published Agent API separates caller admission from Agent execution.
 
-## PAT identity
+## Bearer token identity
 
-Use a Personal Access Token in the `Authorization` header:
+Use a bearer token in the `Authorization` header:
 
 ```bash
 Authorization: Bearer grt_pat_...
 ```
 
-A PAT identifies the caller account. It does not carry per-Agent scopes, replace vendor credentials, or participate in BYOK decisions.
+Human Personal Access Tokens identify a human caller account. Organization Service tokens identify a machine caller that can be allowlisted for selected published Agents.
+
+Neither token type replaces the Agent owner's vendor credentials or participates in BYOK decisions.
 
 ## Admission checks
 
@@ -23,9 +25,9 @@ Every request goes through these checks:
 
 1. The Agent exists.
 2. The Agent is published and has an active service endpoint.
-3. The PAT is valid and not revoked.
-4. The caller is an active member of the Agent's Organization.
-5. The caller is allowed by the Agent's access mode.
+3. The bearer token is valid and not revoked.
+4. The caller is an active member or valid machine caller for the Agent's Organization.
+5. The caller is allowed by the Agent's access mode or token allowlist.
 
 ## Agent access modes
 
@@ -36,11 +38,27 @@ Every request goes through these checks:
 
 Having a PAT is not enough. If the caller does not pass the Agent access gate, the API returns a forbidden error.
 
+## Create Task attribution
+
+Create Task supports two caller shapes:
+
+| Caller | Attribution | Threads projection |
+| --- | --- | --- |
+| Human PAT | Implicitly attributed to the PAT owner. | Appears in that human user's Threads. |
+| Organization Service token | No human attribution by default. | Does not appear in any private human Threads. |
+| Organization Service token with `attributed_user_id` | Explicitly attributed to the target human user when the token is allowed to do so. | Appears in the attributed user's Threads. |
+
+`attributed_user_id` is not impersonation. It controls product attribution, Threads projection, and audit context. It does not give the machine caller the target user's runtime credentials, Space permissions, or private data.
+
 ## Owner execution
 
 The Agent executes under the Agent owner's configured access boundary.
 
-The caller is recorded for admission, attribution, and session ownership, but the caller does not become the runtime execution owner and cannot swap in their own vendor credentials.
+The caller is recorded for admission, attribution, and task/session ownership, but the caller does not become the runtime execution owner and cannot swap in their own vendor credentials.
+
+## Channel boundary
+
+First-party Channel adapters, such as Slack-style inbound messages, do not call the Published Agent API and do not consume Human PATs or Organization Service tokens. Channels use their own installation and binding checks, then create work through Groots internal session primitives.
 
 ## Token lifecycle
 
