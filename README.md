@@ -1,13 +1,13 @@
-# Groots Docs
+# Mosoo Docs
 
-Mintlify documentation for the Groots Published Agent API.
+Mintlify documentation for the Mosoo Published Agent API.
 
 ## OpenAPI source
 
-The API Reference is generated from:
+The API Reference is generated from the local OpenAPI snapshot:
 
 ```text
-https://groots.ai/api/v1/openapi.json
+mosoo-openapi.generated.json
 ```
 
 ## Local preview

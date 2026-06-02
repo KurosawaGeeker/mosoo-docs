@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Groots API",
+  "name": "Mosoo API",
   "colors": {
     "primary": "#0F6B45"
   },
@@ -18,7 +18,7 @@
       },
       {
         "group": "API Reference",
-        "openapi": "https://groots.ai/api/v1/openapi.json"
+        "openapi": "mosoo-openapi.generated.json"
       }
     ]
   }

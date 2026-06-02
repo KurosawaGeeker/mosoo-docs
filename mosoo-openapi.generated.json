@@ -1,0 +1,1654 @@
+{
+  "components": {
+    "responses": {
+      "Conflict": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        },
+        "description": "The Agent/session state rejects this action, or an Idempotency-Key is already processing or was reused for a different request."
+      },
+      "Forbidden": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        },
+        "description": "The caller cannot consume this Agent."
+      },
+      "InternalError": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        },
+        "description": "The request failed unexpectedly."
+      },
+      "InvalidRequest": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        },
+        "description": "The request shape or query value is invalid."
+      },
+      "NotFound": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        },
+        "description": "The resource was not found for this caller."
+      },
+      "RateLimited": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        },
+        "description": "The caller token exceeded the public API request budget for the current window.",
+        "headers": {
+          "Retry-After": {
+            "description": "Seconds to wait before retrying the request.",
+            "schema": {
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        }
+      },
+      "Unauthenticated": {
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        },
+        "description": "A valid Human PAT or Service token is required."
+      }
+    },
+    "schemas": {
+      "ThreadEventInput": {
+        "oneOf": [
+          {
+            "additionalProperties": false,
+            "properties": {
+              "attachmentIds": {
+                "items": {
+                  "type": "string"
+                },
+                "type": "array"
+              },
+              "clientRequestId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "text": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": {
+                "const": "user_message"
+              }
+            },
+            "required": [
+              "type",
+              "text"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "decision": {
+                "enum": [
+                  "allow_once",
+                  "reject_once"
+                ]
+              },
+              "requestId": {
+                "minLength": 1,
+                "type": "string"
+              },
+              "type": {
+                "const": "permission_decision"
+              }
+            },
+            "required": [
+              "type",
+              "requestId",
+              "decision"
+            ],
+            "type": "object"
+          },
+          {
+            "additionalProperties": false,
+            "properties": {
+              "runId": {
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "type": {
+                "const": "user_interrupt"
+              }
+            },
+            "required": [
+              "type"
+            ],
+            "type": "object"
+          }
+        ]
+      },
+      "SendEventsRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/ThreadEventInput"
+            },
+            "minItems": 1,
+            "type": "array"
+          }
+        },
+        "required": [
+          "events"
+        ],
+        "type": "object"
+      },
+      "CreateThreadFileRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "contentBase64": {
+            "description": "Base64-encoded file bytes, or a data URL.",
+            "maxLength": 13981272,
+            "type": "string"
+          },
+          "contentType": {
+            "maxLength": 255,
+            "type": "string"
+          },
+          "name": {
+            "maxLength": 255,
+            "type": "string"
+          }
+        },
+        "required": [
+          "contentBase64",
+          "contentType",
+          "name"
+        ],
+        "type": "object"
+      },
+      "ErrorResponse": {
+        "properties": {
+          "error": {
+            "properties": {
+              "code": {
+                "enum": [
+                  "agent_not_published",
+                  "forbidden",
+                  "idempotency_conflict",
+                  "internal_error",
+                  "invalid_json",
+                  "invalid_request",
+                  "not_found",
+                  "rate_limited",
+                  "readiness_blocked",
+                  "service_inactive",
+                  "unauthenticated"
+                ]
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "type": "object"
+      },
+      "SendEventsResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "acceptedAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/ThreadEventResult"
+            },
+            "type": "array"
+          },
+          "thread": {
+            "$ref": "#/components/schemas/ThreadSummary"
+          },
+          "warnings": {
+            "items": {
+              "$ref": "#/components/schemas/UserWarning"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "acceptedAt",
+          "events",
+          "thread",
+          "warnings"
+        ],
+        "type": "object"
+      },
+      "ThreadEventLogEntry": {
+        "additionalProperties": false,
+        "properties": {
+          "content": {
+            "type": "string"
+          },
+          "durationMs": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "occurredAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "available",
+              "error",
+              "unsupported"
+            ]
+          },
+          "tokens": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "type": {
+            "enum": [
+              "agent.message.delta",
+              "agent.thinking.delta",
+              "file.changed",
+              "run.completed",
+              "run.failed",
+              "run.started",
+              "session.status",
+              "session_files.updated",
+              "tool.confirmation.required",
+              "tool.use.completed",
+              "tool.use.started",
+              "usage.updated",
+              "user.message"
+            ]
+          }
+        },
+        "required": [
+          "content",
+          "durationMs",
+          "id",
+          "occurredAt",
+          "status",
+          "tokens",
+          "type"
+        ],
+        "type": "object"
+      },
+      "ThreadEventListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "events": {
+            "items": {
+              "$ref": "#/components/schemas/ThreadEventLogEntry"
+            },
+            "type": "array"
+          },
+          "truncated": {
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "events",
+          "truncated"
+        ],
+        "type": "object"
+      },
+      "ThreadEventResult": {
+        "additionalProperties": false,
+        "properties": {
+          "clientRequestId": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "run": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RunSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "type": {
+            "enum": [
+              "permission_decision",
+              "user_interrupt",
+              "user_message"
+            ]
+          }
+        },
+        "required": [
+          "clientRequestId",
+          "run",
+          "type"
+        ],
+        "type": "object"
+      },
+      "CreateThreadRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "attributed_user_id": {
+            "type": "string"
+          },
+          "client_external_ref": {
+            "maxLength": 255,
+            "type": "string"
+          },
+          "files": {
+            "description": "Draft file handles uploaded by the same Human PAT caller. Organization Service tokens cannot attach files until machine-owned upload handles are available.",
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "file_id": {
+                  "maxLength": 255,
+                  "minLength": 1,
+                  "type": "string"
+                }
+              },
+              "required": [
+                "file_id"
+              ],
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "input": {
+            "additionalProperties": false,
+            "properties": {
+              "content": {
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "text": {
+                      "maxLength": 32000,
+                      "minLength": 1,
+                      "type": "string"
+                    },
+                    "type": {
+                      "const": "text"
+                    }
+                  },
+                  "required": [
+                    "type",
+                    "text"
+                  ],
+                  "type": "object"
+                },
+                "minItems": 1,
+                "type": "array"
+              },
+              "type": {
+                "const": "user.message"
+              }
+            },
+            "required": [
+              "type",
+              "content"
+            ],
+            "type": "object"
+          }
+        },
+        "required": [
+          "input"
+        ],
+        "type": "object"
+      },
+      "CreateThreadResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "links": {
+            "$ref": "#/components/schemas/ThreadLinks"
+          },
+          "run": {
+            "$ref": "#/components/schemas/RunSummary"
+          },
+          "thread": {
+            "$ref": "#/components/schemas/ThreadSummary"
+          }
+        },
+        "required": [
+          "links",
+          "run",
+          "thread"
+        ],
+        "type": "object"
+      },
+      "RetrieveThreadResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "links": {
+            "$ref": "#/components/schemas/ThreadLinks"
+          },
+          "run": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RunSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "thread": {
+            "$ref": "#/components/schemas/ThreadSummary"
+          }
+        },
+        "required": [
+          "links",
+          "run",
+          "thread"
+        ],
+        "type": "object"
+      },
+      "ThreadFile": {
+        "additionalProperties": false,
+        "properties": {
+          "committed": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "description": "Files added through the public API are attachments; artifacts are files produced by the Agent.",
+            "enum": [
+              "attachment",
+              "artifact"
+            ]
+          },
+          "mimeType": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "size": {
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "required": [
+          "committed",
+          "createdAt",
+          "id",
+          "kind",
+          "mimeType",
+          "name",
+          "size"
+        ],
+        "type": "object"
+      },
+      "ThreadFileListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "files": {
+            "items": {
+              "$ref": "#/components/schemas/ThreadFile"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "files"
+        ],
+        "type": "object"
+      },
+      "ThreadFileResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "file": {
+            "$ref": "#/components/schemas/ThreadFile"
+          }
+        },
+        "required": [
+          "file"
+        ],
+        "type": "object"
+      },
+      "ThreadAttributedUser": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ],
+        "type": "object"
+      },
+      "ThreadCaller": {
+        "additionalProperties": false,
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "human_pat",
+              "service_token"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "kind"
+        ],
+        "type": "object"
+      },
+      "ThreadLinks": {
+        "additionalProperties": false,
+        "properties": {
+          "thread": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "thread"
+        ],
+        "type": "object"
+      },
+      "ThreadSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "agent_id": {
+            "type": "string"
+          },
+          "attributed_user": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/ThreadAttributedUser"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "client_external_ref": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "created_by": {
+            "$ref": "#/components/schemas/ThreadCaller"
+          },
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "pet",
+              "cattle"
+            ]
+          },
+          "last_run_id": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "source": {
+            "const": "api"
+          },
+          "status": {
+            "enum": [
+              "IDLE",
+              "RUNNING",
+              "RESCHEDULING",
+              "TERMINATED"
+            ]
+          },
+          "title": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "agent_id",
+          "attributed_user",
+          "client_external_ref",
+          "created_at",
+          "created_by",
+          "id",
+          "kind",
+          "last_run_id",
+          "source",
+          "status",
+          "title",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "RunSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "completedAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "createdAt": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "id": {
+            "type": "string"
+          },
+          "startedAt": {
+            "format": "date-time",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status": {
+            "enum": [
+              "queued",
+              "booting",
+              "running",
+              "waiting_input",
+              "completed",
+              "failed",
+              "cancelled",
+              "expired"
+            ]
+          },
+          "trigger": {
+            "enum": [
+              "user_prompt",
+              "retry",
+              "resume",
+              "system"
+            ]
+          },
+          "updatedAt": {
+            "format": "date-time",
+            "type": "string"
+          }
+        },
+        "required": [
+          "completedAt",
+          "createdAt",
+          "id",
+          "startedAt",
+          "status",
+          "trigger",
+          "updatedAt"
+        ],
+        "type": "object"
+      },
+      "UserWarning": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "publicApiBearer": {
+        "bearerFormat": "Mosoo Human PAT or Organization Service token",
+        "description": "Use Authorization: Bearer grt_pat_... for Human PAT calls or an Organization Service token for machine calls.",
+        "scheme": "bearer",
+        "type": "http"
+      },
+      "personalAccessToken": {
+        "bearerFormat": "Mosoo PAT",
+        "description": "Use Authorization: Bearer grt_pat_... . PATs identify an account and do not carry scopes.",
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "Public HTTPS API for creating and retrieving Threads on published Mosoo Agents. Human PATs identify an account caller; Organization Service tokens identify machine callers with selected-Agent allowlists. Runtime execution resolves the published Agent owner's capabilities while attribution controls Thread projection.",
+    "title": "Mosoo Published Agent API",
+    "version": "v1"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/agents/{agentId}/threads": {
+      "get": {
+        "description": "Returns Threads created by the authenticated Personal Access Token caller.",
+        "parameters": [
+          {
+            "description": "Published Agent ID from the Agent's API Access panel.",
+            "example": "agent_01KQWXYVXF51M33M24VTA6SC7P",
+            "in": "path",
+            "name": "agentId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-default": "agent_01KQWXYVXF51M33M24VTA6SC7P"
+            }
+          },
+          {
+            "in": "query",
+            "name": "archived",
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "security": [
+          {
+            "personalAccessToken": []
+          }
+        ],
+        "summary": "List Threads for a published Agent",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "threads": {
+                      "items": {
+                        "$ref": "#/components/schemas/ThreadSummary"
+                      },
+                      "type": "array"
+                    }
+                  },
+                  "required": [
+                    "threads"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Thread list."
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "description": "Creates a Thread, the backing AgentSession, and the initial Run. Human PAT callers are implicitly attributed to the PAT owner. Organization Service tokens may omit human attribution or pass attributed_user_id when the token is allowed to do so.",
+        "parameters": [
+          {
+            "description": "Published Agent ID from the Agent's API Access panel.",
+            "example": "agent_01KQWXYVXF51M33M24VTA6SC7P",
+            "in": "path",
+            "name": "agentId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-default": "agent_01KQWXYVXF51M33M24VTA6SC7P"
+            }
+          },
+          {
+            "description": "Optional key for retry-safe create-thread and send-events calls. Reusing the same key with the same request returns the original response. Reusing the key while the original request is still processing returns 409.",
+            "example": "thread-20260528-linear-eng-123",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "examples": {
+                "humanPatWithFile": {
+                  "summary": "Human PAT with an uploaded file",
+                  "value": {
+                    "client_external_ref": "linear-ENG-123",
+                    "files": [
+                      {
+                        "file_id": "file_01KQX0V62MEXAMPLE7W6X3B2A"
+                      }
+                    ],
+                    "input": {
+                      "content": [
+                        {
+                          "text": "Summarize the attached launch plan and list follow-ups.",
+                          "type": "text"
+                        }
+                      ],
+                      "type": "user.message"
+                    }
+                  }
+                },
+                "serviceTokenNoAttribution": {
+                  "summary": "Service token without human attribution",
+                  "value": {
+                    "client_external_ref": "cron-nightly-check",
+                    "input": {
+                      "content": [
+                        {
+                          "text": "Run the nightly checklist.",
+                          "type": "text"
+                        }
+                      ],
+                      "type": "user.message"
+                    }
+                  }
+                },
+                "serviceTokenWithAttribution": {
+                  "summary": "Service token projecting work to a bound user",
+                  "value": {
+                    "attributed_user_id": "user_01KQX1BOUNDHUMAN7Z8",
+                    "client_external_ref": "support-ticket-182",
+                    "input": {
+                      "content": [
+                        {
+                          "text": "Triage this customer escalation.",
+                          "type": "text"
+                        }
+                      ],
+                      "type": "user.message"
+                    }
+                  }
+                },
+                "cattleAgentSameShape": {
+                  "summary": "Cattle Agent using the same request shape",
+                  "value": {
+                    "input": {
+                      "content": [
+                        {
+                          "text": "Run this one-off published Agent Thread.",
+                          "type": "text"
+                        }
+                      ],
+                      "type": "user.message"
+                    }
+                  }
+                }
+              },
+              "schema": {
+                "$ref": "#/components/schemas/CreateThreadRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "summary": "Create a Thread for a published Agent",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreateThreadResponse"
+                }
+              }
+            },
+            "description": "Created Thread.",
+            "headers": {
+              "Idempotency-Replayed": {
+                "description": "Present as true when this response is replayed from a previous completed request.",
+                "schema": {
+                  "const": "true",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/threads/{threadId}": {
+      "delete": {
+        "parameters": [
+          {
+            "description": "Thread ID returned by create thread.",
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "in": "path",
+            "name": "threadId",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "type": "string",
+              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+            }
+          }
+        ],
+        "security": [
+          {
+            "personalAccessToken": []
+          }
+        ],
+        "summary": "Delete a Thread",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Deleted."
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "get": {
+        "parameters": [
+          {
+            "description": "Thread ID returned by create thread.",
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "in": "path",
+            "name": "threadId",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "type": "string",
+              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+            }
+          }
+        ],
+        "summary": "Retrieve Thread summary",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RetrieveThreadResponse"
+                }
+              }
+            },
+            "description": "Thread summary."
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/threads/{threadId}/archive": {
+      "post": {
+        "parameters": [
+          {
+            "description": "Thread ID returned by create thread.",
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "in": "path",
+            "name": "threadId",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "type": "string",
+              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+            }
+          }
+        ],
+        "security": [
+          {
+            "personalAccessToken": []
+          }
+        ],
+        "summary": "Archive a Thread",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Archived."
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/threads/{threadId}/events": {
+      "get": {
+        "description": "Returns the latest public event log entries for this Thread in chronological order. This is the stable read surface for CLI and API consumers; it does not expose raw runtime payloads, transcript, diagnostics, or streaming.",
+        "parameters": [
+          {
+            "description": "Thread ID returned by create thread.",
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "in": "path",
+            "name": "threadId",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "type": "string",
+              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+            }
+          },
+          {
+            "description": "Maximum number of latest Thread events to return.",
+            "example": 100,
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "maximum": 1000,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "summary": "List Thread events",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadEventListResponse"
+                }
+              }
+            },
+            "description": "Thread event list."
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "parameters": [
+          {
+            "description": "Thread ID returned by create thread.",
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "in": "path",
+            "name": "threadId",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "type": "string",
+              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+            }
+          },
+          {
+            "description": "Optional key for retry-safe create-thread and send-events calls. Reusing the same key with the same request returns the original response. Reusing the key while the original request is still processing returns 409.",
+            "example": "thread-20260528-linear-eng-123",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "schema": {
+              "maxLength": 128,
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SendEventsRequest"
+              },
+              "example": {
+                "events": [
+                  {
+                    "text": "Say hello from the API.",
+                    "type": "user_message"
+                  }
+                ]
+              }
+            }
+          },
+          "required": true
+        },
+        "security": [
+          {
+            "personalAccessToken": []
+          }
+        ],
+        "summary": "Send user messages, permission decisions, or interrupts to a Thread",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SendEventsResponse"
+                }
+              }
+            },
+            "description": "Accepted event batch.",
+            "headers": {
+              "Idempotency-Replayed": {
+                "description": "Present as true when this response is replayed from a previous completed request.",
+                "schema": {
+                  "const": "true",
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/threads/{threadId}/files": {
+      "get": {
+        "parameters": [
+          {
+            "description": "Thread ID returned by create thread.",
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "in": "path",
+            "name": "threadId",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "type": "string",
+              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+            }
+          }
+        ],
+        "security": [
+          {
+            "personalAccessToken": []
+          }
+        ],
+        "summary": "List Thread files",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "files": [
+                    {
+                      "committed": true,
+                      "createdAt": "2026-05-19T00:02:00.000Z",
+                      "id": "file_01KQX0V62MEXAMPLE7W6X3B2A",
+                      "kind": "attachment",
+                      "mimeType": "text/plain",
+                      "name": "brief.txt",
+                      "size": 19
+                    }
+                  ]
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadFileListResponse"
+                }
+              }
+            },
+            "description": "Thread file list."
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
+      "post": {
+        "description": "Adds a user-provided file to this Thread. The JSON request carries file bytes in contentBase64; Mosoo decodes and stores the file as a Thread attachment.",
+        "parameters": [
+          {
+            "description": "Thread ID returned by create thread.",
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "in": "path",
+            "name": "threadId",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "type": "string",
+              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+            }
+          }
+        ],
+        "security": [
+          {
+            "personalAccessToken": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateThreadFileRequest"
+              },
+              "example": {
+                "contentBase64": "SGVsbG8gZnJvbSBHcm9vdHMuCg==",
+                "contentType": "text/plain",
+                "name": "brief.txt"
+              }
+            }
+          },
+          "required": true
+        },
+        "summary": "Add a Thread file",
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "example": {
+                  "file": {
+                    "committed": true,
+                    "createdAt": "2026-05-19T00:02:00.000Z",
+                    "id": "file_01KQX0V62MEXAMPLE7W6X3B2A",
+                    "kind": "attachment",
+                    "mimeType": "text/plain",
+                    "name": "brief.txt",
+                    "size": 19
+                  }
+                },
+                "schema": {
+                  "$ref": "#/components/schemas/ThreadFileResponse"
+                }
+              }
+            },
+            "description": "Created Thread file."
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/threads/{threadId}/files/{fileId}": {
+      "delete": {
+        "parameters": [
+          {
+            "description": "Thread ID returned by create thread.",
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "in": "path",
+            "name": "threadId",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "type": "string",
+              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+            }
+          },
+          {
+            "description": "File ID returned by add or list Thread files.",
+            "example": "file_01KQX0V62MEXAMPLE7W6X3B2A",
+            "in": "path",
+            "name": "fileId",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "x-default": "file_01KQX0V62MEXAMPLE7W6X3B2A"
+            }
+          }
+        ],
+        "security": [
+          {
+            "personalAccessToken": []
+          }
+        ],
+        "summary": "Remove a Thread file",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Removed."
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/threads/{threadId}/unarchive": {
+      "post": {
+        "parameters": [
+          {
+            "description": "Thread ID returned by create thread.",
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "in": "path",
+            "name": "threadId",
+            "required": true,
+            "schema": {
+              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "type": "string",
+              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+            }
+          }
+        ],
+        "security": [
+          {
+            "personalAccessToken": []
+          }
+        ],
+        "summary": "Unarchive a Thread",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "properties": {
+                    "ok": {
+                      "const": true
+                    }
+                  },
+                  "required": [
+                    "ok"
+                  ],
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Unarchived."
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "publicApiBearer": []
+    }
+  ],
+  "servers": [
+    {
+      "url": "https://mosoo.ai/api/v1"
+    }
+  ]
+}

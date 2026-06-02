@@ -1,15 +1,15 @@
 ---
 title: "Quickstart"
-description: "Call a published Groots Agent with curl."
+description: "Call a published Mosoo Agent with curl."
 ---
 
 # Quickstart
 
-Call a published Groots Agent in three steps: create a PAT, create a session, then send events to that session.
+Call a published Mosoo Agent in three steps: create a PAT, create a session, then send events to that session.
 
 ## 1. Create a PAT
 
-In Groots, open:
+In Mosoo, open:
 
 ```text
 /settings/access-tokens
@@ -18,32 +18,32 @@ In Groots, open:
 Create a token and copy it once. Store it as an environment variable:
 
 ```bash
-export GROOTS_PAT="grt_pat_..."
-export GROOTS_AGENT_ID="your-published-agent-id"
+export MOSOO_PAT="grt_pat_..."
+export MOSOO_AGENT_ID="your-published-agent-id"
 ```
 
 If you opened this page from an Agent's API Access panel, the URL contains
-`agentId`. Use that value for `GROOTS_AGENT_ID`.
+`agentId`. Use that value for `MOSOO_AGENT_ID`.
 
 ## 2. Create a session
 
 ```bash
-curl -X POST "https://groots.ai/api/v1/agents/$GROOTS_AGENT_ID/sessions" \
-  -H "Authorization: Bearer $GROOTS_PAT" \
+curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/sessions" \
+  -H "Authorization: Bearer $MOSOO_PAT" \
   -H "Content-Type: application/json"
 ```
 
 Copy `session.id` from the response:
 
 ```bash
-export GROOTS_SESSION_ID="session-id-from-response"
+export MOSOO_SESSION_ID="session-id-from-response"
 ```
 
 ## 3. Send a user message
 
 ```bash
-curl -X POST "https://groots.ai/api/v1/sessions/$GROOTS_SESSION_ID/events" \
-  -H "Authorization: Bearer $GROOTS_PAT" \
+curl -X POST "https://mosoo.ai/api/v1/sessions/$MOSOO_SESSION_ID/events" \
+  -H "Authorization: Bearer $MOSOO_PAT" \
   -H "Content-Type: application/json" \
   -d '{"events":[{"type":"user_message","text":"Say hello"}]}'
 ```
@@ -51,8 +51,8 @@ curl -X POST "https://groots.ai/api/v1/sessions/$GROOTS_SESSION_ID/events" \
 ## 4. Replay events
 
 ```bash
-curl "https://groots.ai/api/v1/sessions/$GROOTS_SESSION_ID/events" \
-  -H "Authorization: Bearer $GROOTS_PAT"
+curl "https://mosoo.ai/api/v1/sessions/$MOSOO_SESSION_ID/events" \
+  -H "Authorization: Bearer $MOSOO_PAT"
 ```
 
 ## Notes
@@ -61,4 +61,4 @@ curl "https://groots.ai/api/v1/sessions/$GROOTS_SESSION_ID/events" \
 - The Agent must be published.
 - The caller must still pass Organization membership and Agent access checks.
 - The Agent executes under the Agent owner's configured access boundary.
-- API Reference examples use placeholder IDs. Replace them with the Agent ID and session ID from Groots before pressing Try it.
+- API Reference examples use placeholder IDs. Replace them with the Agent ID and session ID from Mosoo before pressing Try it.
