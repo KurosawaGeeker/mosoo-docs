@@ -2,23 +2,80 @@
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
   "name": "Mosoo API",
+  "description": "Developer documentation for calling published Mosoo Agents.",
   "colors": {
-    "primary": "#0F6B45"
+    "primary": "#086030"
   },
+  "logo": {
+    "light": "/images/brand/logo-api-onlight.svg",
+    "dark": "/images/brand/logo-api-ondark.svg"
+  },
+  "favicon": "/images/brand/favicon.svg",
   "api": {
     "examples": {
       "prefill": true
     }
   },
   "navigation": {
-    "groups": [
+    "languages": [
       {
-        "group": "Start",
-        "pages": ["index", "quickstart", "auth-and-access"]
+        "language": "en",
+        "default": true,
+        "tabs": [
+          {
+            "tab": "API",
+            "icon": "code",
+            "groups": [
+              {
+                "group": "Start",
+                "pages": ["index", "quickstart", "auth-and-access"]
+              },
+              {
+                "group": "API Reference",
+                "openapi": "mosoo-openapi.generated.json"
+              }
+            ]
+          },
+          {
+            "tab": "CLI",
+            "icon": "terminal",
+            "groups": [
+              {
+                "group": "CLI",
+                "pages": ["cli/overview"]
+              }
+            ]
+          }
+        ]
       },
       {
-        "group": "API Reference",
-        "openapi": "mosoo-openapi.generated.json"
+        "language": "zh-Hans",
+        "tabs": [
+          {
+            "tab": "API",
+            "icon": "code",
+            "groups": [
+              {
+                "group": "开始",
+                "pages": ["zh-Hans/index", "zh-Hans/quickstart", "zh-Hans/auth-and-access"]
+              },
+              {
+                "group": "API Reference",
+                "openapi": "mosoo-openapi.generated.json"
+              }
+            ]
+          },
+          {
+            "tab": "CLI",
+            "icon": "terminal",
+            "groups": [
+              {
+                "group": "CLI",
+                "pages": ["zh-Hans/cli/overview"]
+              }
+            ]
+          }
+        ]
       }
     ]
   }

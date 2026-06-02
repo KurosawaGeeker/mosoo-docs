@@ -1,0 +1,96 @@
+---
+title: "认证和访问控制"
+description: "调用方 token、已发布 Agent 访问、归因和 owner execution 的工作方式。"
+---
+
+# 认证和访问控制
+
+Mosoo API 会把 **谁在调用** 和 **哪个已发布 Agent 可以运行** 分开处理。
+
+每个请求都使用 bearer token：
+
+```bash
+Authorization: Bearer grt_pat_...
+```
+
+token 标识调用方。`agentId` 标识已发布 Agent。Mosoo 会同时检查这两者，然后才会创建或修改 Thread。
+
+## Token 类型
+
+<Columns cols={2}>
+  <Card title="Human PAT" icon="user-round">
+    面向注册用户的长期 token。适合 curl、本地工具、用户拥有的集成，以及需要归因到某个人的 API 调用。
+  </Card>
+  <Card title="Organization Service token" icon="server">
+    面向客户后端、CI/CD、Managed CLI 和服务端任务的机器调用方 token。它必须被允许调用指定的已发布 Agent。
+  </Card>
+</Columns>
+
+<Warning>
+  Service token 不是 Channel 绑定凭据。Slack、Lark、Discord、Telegram、WeChat 等 Channel 设置仍然在 Mosoo 中管理。
+</Warning>
+
+## 已发布 Agent 访问
+
+只有 Agent 配置并发布后，API Access 才可用。一个有效请求必须通过这些检查：
+
+1. Agent 存在。
+2. Agent 已发布，并启用 API Access。
+3. bearer token 有效且未被撤销。
+4. 调用方被允许使用这个 Agent。
+5. 被请求的 Thread 或文件属于该调用方可见的 API surface。
+
+## 调用方访问路径
+
+| 访问路径 | 谁可以调用 |
+| --- | --- |
+| Organization-wide | 拥有有效 Human PAT 的活跃组织成员，以及被允许的 Service token。 |
+| Invited-only | Agent owner、被显式邀请的协作者，以及被允许的 Service token。 |
+| Selected Agent service access | 显式包含这个已发布 Agent 的 Organization Service token。 |
+
+有 token 不代表一定能调用。如果调用方没有通过 Agent 访问门禁，Mosoo 会返回 forbidden error。
+
+## 归因和执行
+
+Mosoo 会记录 API 调用方，用于准入、归因、审计和 Thread projection。
+
+运行时执行仍然解析到已发布 Agent owner 配置的能力边界。API 调用方不会替换 Agent owner，不会改变 Agent 的 Provider，也不能在请求时注入新的 vendor credentials。
+
+Human PAT 调用时，调用方就是 token owner。Organization Service token 调用时，请求可以不带 human attribution；如果该 token 被允许，也可以通过 `attributed_user_id` 把工作投射到一个绑定用户。
+
+```json
+{
+  "attributed_user_id": "user_01KQX1BOUNDHUMAN7Z8",
+  "client_external_ref": "support-ticket-182",
+  "input": {
+    "type": "user.message",
+    "content": [
+      {
+        "type": "text",
+        "text": "Triage this customer escalation."
+      }
+    ]
+  }
+}
+```
+
+## Token 生命周期
+
+在 Mosoo 中创建和撤销 token。撤销 token 会阻止该 token 发起新的 API 请求；它不会删除已经存在的 Threads。
+
+建议为不同系统使用不同 token：
+
+- 本地开发使用一个 Human PAT，
+- 每个后端或自动化任务使用一个 Service token，
+- 给 Service token 配置 selected Agent allowlist，
+- 用清晰的 token label 支持审计和轮换。
+
+## 幂等性
+
+创建 Thread 和发送事件时使用 `Idempotency-Key`，可以安全重试。
+
+```bash
+-H "Idempotency-Key: support-ticket-182-create-thread"
+```
+
+使用相同 key 和相同请求会返回原始响应。如果原请求还在处理中，或同一个 key 被用于不同请求，会返回 conflict。

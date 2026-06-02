@@ -1,47 +1,96 @@
 ---
 title: "Authentication and access"
-description: "How PAT identity, Organization membership, Agent access, and owner execution work."
+description: "How caller tokens, published Agent access, attribution, and owner execution work."
 ---
 
 # Authentication and access
 
-The Published Agent API separates caller admission from Agent execution.
+The Mosoo API separates **who is calling** from **which published Agent is allowed to run**.
 
-## PAT identity
-
-Use a Personal Access Token in the `Authorization` header:
+Every request uses a bearer token:
 
 ```bash
 Authorization: Bearer grt_pat_...
 ```
 
-A PAT identifies the caller account. It does not carry per-Agent scopes, replace vendor credentials, or participate in BYOK decisions.
+The token identifies the caller. The `agentId` identifies the published Agent. Mosoo checks both before it creates or changes a Thread.
 
-## Admission checks
+## Token types
 
-Every request goes through these checks:
+<Columns cols={2}>
+  <Card title="Human PAT" icon="user-round">
+    A long-lived token for a registered user. Use it for curl, local tools, user-owned integrations, and API calls that should be attributed to that person.
+  </Card>
+  <Card title="Organization Service token" icon="server">
+    A machine caller token for customer backends, CI/CD, Managed CLI, and server jobs. It must be allowed to call selected published Agents.
+  </Card>
+</Columns>
+
+<Warning>
+  Service tokens are not Channel binding credentials. Slack, Lark, Discord, Telegram, WeChat, and other Channel setup stays in Mosoo.
+</Warning>
+
+## Published Agent access
+
+API access is available only after an Agent is configured and published. A valid request must pass these checks:
 
 1. The Agent exists.
-2. The Agent is published and has an active service endpoint.
-3. The PAT is valid and not revoked.
-4. The caller is an active member of the Agent's Organization.
-5. The caller is allowed by the Agent's access mode.
+2. The Agent is published and has API Access enabled.
+3. The bearer token is valid and not revoked.
+4. The caller is allowed to use the Agent.
+5. The requested Thread or file belongs to the visible API surface for that caller.
 
-## Agent access modes
+## Caller access paths
 
-| Mode | Who can call |
+| Access path | Who can call |
 | --- | --- |
-| Organization-wide | Any active Organization member with a valid PAT. |
-| Invited-only | The Agent owner and explicitly invited collaborators. |
+| Organization-wide | Active Organization members with a valid Human PAT, plus allowed Service tokens. |
+| Invited-only | The Agent owner, explicitly invited collaborators, and allowed Service tokens. |
+| Selected Agent service access | Organization Service tokens that explicitly include this published Agent. |
 
-Having a PAT is not enough. If the caller does not pass the Agent access gate, the API returns a forbidden error.
+Having a token is not enough. If the caller does not pass the Agent access gate, Mosoo returns a forbidden error.
 
-## Owner execution
+## Attribution and execution
 
-The Agent executes under the Agent owner's configured access boundary.
+Mosoo records the API caller for admission, attribution, auditing, and Thread projection.
 
-The caller is recorded for admission, attribution, and session ownership, but the caller does not become the runtime execution owner and cannot swap in their own vendor credentials.
+Runtime execution still resolves through the published Agent owner's configured capabilities. The API caller does not replace the Agent owner, change the Agent's Provider, or inject new vendor credentials at request time.
+
+For Human PAT calls, the caller is the token owner. For Organization Service token calls, the request may omit human attribution or include `attributed_user_id` when that token is allowed to project work to a bound user.
+
+```json
+{
+  "attributed_user_id": "user_01KQX1BOUNDHUMAN7Z8",
+  "client_external_ref": "support-ticket-182",
+  "input": {
+    "type": "user.message",
+    "content": [
+      {
+        "type": "text",
+        "text": "Triage this customer escalation."
+      }
+    ]
+  }
+}
+```
 
 ## Token lifecycle
 
-Create and revoke tokens at `/settings/access-tokens`. Revoking a token blocks future API requests from that token; it does not delete existing sessions.
+Create and revoke tokens from Mosoo. Revoking a token blocks future API requests from that token; it does not delete existing Threads.
+
+Use separate tokens for separate systems when possible:
+
+- one Human PAT for local development,
+- one Service token per backend or automation,
+- selected Agent allowlists for Service tokens,
+- clear token labels for audit and rotation.
+
+## Idempotency
+
+Use `Idempotency-Key` for retry-safe create-thread and send-events calls.
+
+```bash
+-H "Idempotency-Key: support-ticket-182-create-thread"
+```
+
+Reusing the same key with the same request returns the original response. Reusing it while the first request is still processing, or with a different request, returns a conflict.
