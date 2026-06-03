@@ -1,6 +1,6 @@
 ---
 title: "快速开始"
-description: "用 curl 在已发布的 Mosoo Agent 上创建 Thread。"
+description: "用 curl 为已发布的 Mosoo Agent 创建 Thread。"
 ---
 
 # 快速开始
@@ -12,7 +12,7 @@ description: "用 curl 在已发布的 Mosoo Agent 上创建 Thread。"
 你需要：
 
 - 一个已经在 Mosoo 中发布的 Agent。
-- Agent API Access 面板里的 Agent ID。
+- Agent API 接入面板里的 Agent ID。
 - 被允许调用这个 Agent 的 Human PAT 或 Organization Service token。
 
 ```bash
@@ -21,12 +21,12 @@ export MOSOO_AGENT_ID="agent_..."
 ```
 
 <Info>
-  如果你是从 Agent 的 **API Access** 动作打开这份文档，就使用那里展示的 `agentId`。
+  如果你是从 Agent 的 **API 接入（API Access）** 动作打开这份文档，就使用那里展示的 `agentId`。
 </Info>
 
 ## 1. 创建 Thread
 
-Thread 是已发布 Agent 的 API 对话容器。创建 Thread 也会启动初始 run。
+Thread 是已发布 Agent 的 API 对话容器。创建 Thread 也会启动初始运行。
 
 ```bash
 curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
@@ -83,7 +83,7 @@ curl "https://mosoo.ai/api/v1/threads/$MOSOO_THREAD_ID/events?limit=100" \
   -H "Authorization: Bearer $MOSOO_API_TOKEN"
 ```
 
-事件日志是 API 调用方稳定的读取面。它可能包含用户消息、Agent 消息增量、thinking 增量、工具状态、文件变化、用量更新和 run 状态。
+事件日志是 API 调用方稳定读取结果的位置。它可能包含用户消息、Agent 消息增量、thinking 增量、工具状态、文件变化、用量更新和运行状态。
 
 ## 4. 附加文件
 

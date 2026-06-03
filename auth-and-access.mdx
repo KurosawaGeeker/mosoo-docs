@@ -1,6 +1,6 @@
 ---
 title: "Authentication and access"
-description: "How caller tokens, published Agent access, attribution, and owner execution work."
+description: "How caller tokens, published Agent access, attribution, and owner settings work."
 ---
 
 # Authentication and access
@@ -22,12 +22,12 @@ The token identifies the caller. The `agentId` identifies the published Agent. M
     A long-lived token for a registered user. Use it for curl, local tools, user-owned integrations, and API calls that should be attributed to that person.
   </Card>
   <Card title="Organization Service token" icon="server">
-    A machine caller token for customer backends, CI/CD, Managed CLI, and server jobs. It must be allowed to call selected published Agents.
+    A machine caller token for server-side integrations, CI/CD, Managed CLI, and scheduled jobs. It must be allowed to call selected published Agents.
   </Card>
 </Columns>
 
 <Warning>
-  Service tokens are not Channel binding credentials. Slack, Lark, Discord, Telegram, WeChat, and other Channel setup stays in Mosoo.
+  Service tokens are not channel connection credentials. Slack, Lark, Discord, Telegram, WeChat, and other channel setup stays in Mosoo.
 </Warning>
 
 ## Published Agent access
@@ -38,7 +38,7 @@ API access is available only after an Agent is configured and published. A valid
 2. The Agent is published and has API Access enabled.
 3. The bearer token is valid and not revoked.
 4. The caller is allowed to use the Agent.
-5. The requested Thread or file belongs to the visible API surface for that caller.
+5. The requested Thread or file is visible to that caller.
 
 ## Caller access paths
 
@@ -48,15 +48,15 @@ API access is available only after an Agent is configured and published. A valid
 | Invited-only | The Agent owner, explicitly invited collaborators, and allowed Service tokens. |
 | Selected Agent service access | Organization Service tokens that explicitly include this published Agent. |
 
-Having a token is not enough. If the caller does not pass the Agent access gate, Mosoo returns a forbidden error.
+Having a token is not enough. If the caller does not pass the Agent access check, Mosoo returns `403 Forbidden`.
 
 ## Attribution and execution
 
-Mosoo records the API caller for admission, attribution, auditing, and Thread projection.
+Mosoo records the API caller for access checks, attribution, audit logs, and Thread visibility.
 
-Runtime execution still resolves through the published Agent owner's configured capabilities. The API caller does not replace the Agent owner, change the Agent's Provider, or inject new vendor credentials at request time.
+Runs still use the published Agent owner's configured capabilities. The API caller does not become the Agent owner, change the Agent's model provider, or supply provider credentials in the request.
 
-For Human PAT calls, the caller is the token owner. For Organization Service token calls, the request may omit human attribution or include `attributed_user_id` when that token is allowed to project work to a bound user.
+For Human PAT calls, the caller is the token owner. For Organization Service token calls, the request may omit user attribution or include `attributed_user_id` when that token is allowed to associate work with a bound user.
 
 ```json
 {
@@ -81,8 +81,8 @@ Create and revoke tokens from Mosoo. Revoking a token blocks future API requests
 Use separate tokens for separate systems when possible:
 
 - one Human PAT for local development,
-- one Service token per backend or automation,
-- selected Agent allowlists for Service tokens,
+- one Service token per server-side integration or automation,
+- selected published Agents for Service tokens,
 - clear token labels for audit and rotation.
 
 ## Idempotency

@@ -9,7 +9,7 @@
             }
           }
         },
-        "description": "The Agent/session state rejects this action, or an Idempotency-Key is already processing or was reused for a different request."
+        "description": "The Thread state rejects this action, or an Idempotency-Key is already processing or was reused for a different request."
       },
       "Forbidden": {
         "content": {
@@ -388,7 +388,7 @@
             "type": "string"
           },
           "files": {
-            "description": "Draft file handles uploaded by the same Human PAT caller. Organization Service tokens cannot attach files until machine-owned upload handles are available.",
+            "description": "File handles uploaded by the same Human PAT caller. Organization Service tokens cannot attach files until service-token file uploads are available.",
             "items": {
               "additionalProperties": false,
               "properties": {
@@ -783,7 +783,7 @@
     }
   },
   "info": {
-    "description": "Public HTTPS API for creating and retrieving Threads on published Mosoo Agents. Human PATs identify an account caller; Organization Service tokens identify machine callers with selected-Agent allowlists. Runtime execution resolves the published Agent owner's capabilities while attribution controls Thread projection.",
+    "description": "Public HTTPS API for creating and retrieving Threads on published Mosoo Agents. Human PATs identify account callers; Organization Service tokens identify machine callers that are allowed to call selected published Agents. Runs use the published Agent owner's configured capabilities, and attribution controls which user the work is associated with.",
     "title": "Mosoo Published Agent API",
     "version": "v1"
   },
@@ -864,7 +864,7 @@
         }
       },
       "post": {
-        "description": "Creates a Thread, the backing AgentSession, and the initial Run. Human PAT callers are implicitly attributed to the PAT owner. Organization Service tokens may omit human attribution or pass attributed_user_id when the token is allowed to do so.",
+        "description": "Creates a Thread and starts the initial Run. Human PAT callers are attributed to the PAT owner. Organization Service tokens may omit user attribution or pass attributed_user_id when the token is allowed to do so.",
         "parameters": [
           {
             "description": "Published Agent ID from the Agent's API Access panel.",
@@ -1192,7 +1192,7 @@
     },
     "/threads/{threadId}/events": {
       "get": {
-        "description": "Returns the latest public event log entries for this Thread in chronological order. This is the stable read surface for CLI and API consumers; it does not expose raw runtime payloads, transcript, diagnostics, or streaming.",
+        "description": "Returns the latest public event log entries for this Thread in chronological order. This is the stable public log for CLI and API consumers; it does not expose raw runtime payloads, transcript, diagnostics, or streaming.",
         "parameters": [
           {
             "description": "Thread ID returned by create thread.",

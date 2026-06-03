@@ -26,7 +26,7 @@ export MOSOO_AGENT_ID="agent_..."
 
 ## 1. Create a Thread
 
-A Thread is the API conversation container for a published Agent. Creating one also starts the initial run.
+A Thread is the API conversation container for a published Agent. Creating one also starts the first run.
 
 ```bash
 curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
@@ -83,7 +83,7 @@ curl "https://mosoo.ai/api/v1/threads/$MOSOO_THREAD_ID/events?limit=100" \
   -H "Authorization: Bearer $MOSOO_API_TOKEN"
 ```
 
-The event log is the stable read surface for API consumers. It can include user messages, Agent message deltas, thinking deltas, tool status, file changes, usage updates, and run status.
+The event log is the stable place to read results. It can include user messages, Agent message deltas, thinking deltas, tool status, file changes, usage updates, and run status.
 
 ## 4. Attach a file
 

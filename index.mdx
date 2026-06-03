@@ -10,15 +10,15 @@ Use the Mosoo API to call an Agent after it has been configured and published in
 This is the same integration surface behind the **API Access** entry in the Agent publish menu.
 
 <Note>
-  The API only works with published Agents. Agent setup, Provider configuration, and Channel bindings are managed in Mosoo before you call these endpoints.
+  The API only works with published Agents. Agent setup, model provider connections, and channel bindings are managed in Mosoo before you call these endpoints.
 </Note>
 
 <Columns cols={3}>
   <Card title="1. Publish an Agent" icon="bot">
-    Configure the Agent in Mosoo, connect its Provider, and publish it so it receives an `agentId`.
+    Configure the Agent in Mosoo, connect its model provider, and publish it so it receives an `agentId`.
   </Card>
   <Card title="2. Create a token" icon="key-round">
-    Use a Human PAT for user-owned calls or an Organization Service token for backend jobs.
+    Use a Human PAT for user-owned calls or an Organization Service token for server-side jobs.
   </Card>
   <Card title="3. Start a Thread" icon="messages-square">
     Create a Thread with an initial message, then send events, attach files, and read results.
@@ -61,7 +61,7 @@ The response includes a `thread.id` and the first `run`. Use that Thread ID for 
     The callable Agent identity. Copy its `agentId` from the Agent's API Access panel after publishing.
   </Card>
   <Card title="Caller token" icon="badge-check">
-    A Human PAT or Organization Service token. The token identifies the caller; it does not replace the Agent owner's runtime configuration.
+    A Human PAT or Organization Service token. The token identifies the caller; it does not change which published Agent is run or how that Agent is configured.
   </Card>
   <Card title="Thread" icon="message-circle">
     The conversation container created through the API. Threads track messages, files, run status, attribution, and lifecycle state.
@@ -75,13 +75,13 @@ The response includes a `thread.id` and the first `run`. Use that Thread ID for 
 
 Use the API when a published Agent should become part of another product or workflow:
 
-- Start an Agent from your own backend when a ticket, order, alert, or job appears.
+- Start an Agent from your own server when a ticket, order, alert, or job appears.
 - Project work to a user through `attributed_user_id` when an Organization Service token is allowed to do so.
 - Attach files to a Thread before or during a run.
 - Poll the public event log for Agent messages, tool status, file changes, usage updates, and run completion.
 - Keep external systems in sync with `client_external_ref` and `Idempotency-Key`.
 
-## API surface
+## API capabilities
 
 <Columns cols={2}>
   <Card title="Create and list Threads" icon="list-tree" href="/api-reference/create-a-thread-for-a-published-agent">
@@ -91,7 +91,7 @@ Use the API when a published Agent should become part of another product or work
     `POST /threads/{threadId}/events` sends user messages, permission decisions, or interrupts. `GET /threads/{threadId}/events` reads the public event log.
   </Card>
   <Card title="Attach files" icon="paperclip" href="/api-reference/add-a-thread-file">
-    Add, list, and remove Thread files. API-added files are attachments; Agent-produced files are artifacts.
+    Add, list, and remove Thread files. API-added files are attachments; Agent-produced files are returned as artifacts.
   </Card>
   <Card title="Manage lifecycle" icon="archive" href="/api-reference/archive-a-thread">
     Retrieve, archive, unarchive, or delete a Thread when your integration no longer needs it active.
@@ -106,8 +106,8 @@ Every request is evaluated against the published Agent and the caller token:
 - The caller token must be valid and not revoked.
 - Human callers must still pass Organization membership and Agent access checks.
 - Organization Service tokens must be explicitly allowed to call selected published Agents.
-- Runtime execution resolves the published Agent owner's configured capabilities.
+- Runs use the published Agent owner's configured capabilities.
 
 <Card title="Understand tokens and access" icon="shield-check" horizontal href="/auth-and-access">
-  Read how Human PATs, Organization Service tokens, Agent access modes, attribution, and owner execution fit together.
+  Read how Human PATs, Organization Service tokens, Agent access modes, attribution, and owner settings fit together.
 </Card>
