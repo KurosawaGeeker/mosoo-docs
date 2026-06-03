@@ -1,11 +1,11 @@
 ---
 title: "Mosoo API"
-description: "从你的应用中调用已发布的 Mosoo Agent。"
+description: "在你的应用中通过API集成并调用已发布的 Mosoo Agents。"
 ---
 
-# 基于已发布的 Mosoo Agent 开发
+# 基于 Mosoo Agents 开发
 
-Mosoo API 用于在 Agent 已经配置并发布之后，从你的系统里调用这个 Agent。你的应用提供调用方 token 和已发布 Agent 的 `agentId`；Mosoo 会创建 Thread、运行 Agent，并把这个 Thread 的公开事件和文件暴露给 API 调用方。
+Mosoo API 用于在你的应用中集成和调用**已发布**的 Mosoo Agent。你的应用提供 Agent API token 和已发布 Agent 的 `agentId`；Mosoo 会创建 Thread、与 Agent 发起会话，并把这个 Thread 的公开事件和文件暴露给 API 调用方。
 
 这就是 Agent 发布菜单里 **API Access** 入口对应的集成能力。
 
@@ -14,20 +14,23 @@ Mosoo API 用于在 Agent 已经配置并发布之后，从你的系统里调用
 </Note>
 
 <Columns cols={3}>
-  <Card title="1. 发布 Agent" icon="bot">
-    在 Mosoo 中配置 Agent，连接 Provider，并发布它以获得 `agentId`。
+  <Card title="发布 Agent" icon="1" href="http://localhost:5173/agent">
+    在 Mosoo 中[配置 Agent](http://localhost:5173/agent)，[连接 Provider](http://localhost:5173/providers)，并发布它以获得 `agentId`。
   </Card>
-  <Card title="2. 创建 token" icon="key-round">
-    用户本人调用时使用 Human PAT；后端任务或自动化调用时使用 Organization Service token。
+
+  <Card title="创建 Token" icon="2" href="/settings/access-tokens">
+    个人调用时使用个人 API Token；\
+    团队后台自动化任务可使用 Organization API Token。
   </Card>
-  <Card title="3. 创建 Thread" icon="messages-square">
-    用初始消息创建 Thread，然后继续发送事件、附加文件并读取结果。
+
+  <Card title="创建 Thread" icon="3">
+    使用 API 创建 Thread，然后继续发送事件、附加文件并读取结果。
   </Card>
 </Columns>
 
 ## 第一个请求
 
-把访问 token 和已发布 Agent ID 组合起来，就可以创建 Thread。
+把 access token 和 Agent ID 组合起来，就可以创建 Thread。
 
 ```bash
 curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
@@ -57,23 +60,26 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
 ## 核心概念
 
 <Columns cols={2}>
-  <Card title="已发布 Agent" icon="box">
-    可以被 API 调用的 Agent 身份。在 Agent 发布后的 API Access 面板中复制它的 `agentId`。
+  <Card title="已发布 Agent" icon="user-astronaut">
+    可以被 API 调用的 Agent。在 Agent 发布后的 API Access 面板中获取它的 `agentId`。
   </Card>
-  <Card title="调用方 token" icon="badge-check">
-    Human PAT 或 Organization Service token。token 标识调用方，但不会替换 Agent owner 的运行时配置。
+
+  <Card title="调用方 token" icon="key">
+    Human PAT 或 Organization Service token。token 标识调用者身份。
   </Card>
-  <Card title="Thread" icon="message-circle">
+
+  <Card title="Thread" icon="microblog">
     API 创建的对话容器。Thread 记录消息、文件、run 状态、归因和生命周期状态。
   </Card>
-  <Card title="Events" icon="activity">
-    面向 API 调用方的稳定公开日志。你可以发送用户消息或权限决策，再从 Thread 事件列表读取 Agent 可见结果。
+
+  <Card title="Events" icon="tachograph-digital">
+    面向 API 调用者的稳定公开日志。你可以发送用户消息或权限决策，再从 Thread 事件列表读取 Agent 可见结果。
   </Card>
 </Columns>
 
 ## 可以用来做什么
 
-当你希望把已发布的 Agent 接入自己的产品或工作流时，可以使用这个 API：
+当你希望把已发布的 Agent 接入自己的产品或工作流时：
 
 - 当工单、订单、告警或任务出现时，从你的后端启动 Agent。
 - 在 Service token 被允许时，通过 `attributed_user_id` 把工作归因到某个用户。
@@ -87,12 +93,15 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
   <Card title="创建和列出 Threads" icon="list-tree" href="/api-reference/create-a-thread-for-a-published-agent">
     `POST /agents/{agentId}/threads` 创建 Thread 和初始 run。`GET /agents/{agentId}/threads` 列出调用方可见的 Threads。
   </Card>
+
   <Card title="发送和读取事件" icon="send" href="/api-reference/send-user-messages-permission-decisions-or-interrupts-to-a-thread">
     `POST /threads/{threadId}/events` 发送用户消息、权限决策或中断。`GET /threads/{threadId}/events` 读取公开事件日志。
   </Card>
+
   <Card title="附加文件" icon="paperclip" href="/api-reference/add-a-thread-file">
     添加、列出和移除 Thread 文件。API 添加的文件是附件；Agent 生成的文件是 artifact。
   </Card>
+
   <Card title="管理生命周期" icon="archive" href="/api-reference/archive-a-thread">
     当集成不再需要 Thread 保持活跃时，可以读取、归档、恢复或删除 Thread。
   </Card>
