@@ -1,10 +1,10 @@
-# Mosoo Docs
+# mosoo Docs
 
-Mintlify documentation for the Mosoo Published Agent API.
+Mintlify documentation for the mosoo Published Agent API.
 
 ## OpenAPI source
 
-The API Reference is generated from the local OpenAPI snapshot:
+The API reference is generated from the local OpenAPI snapshot:
 
 ```text
 mosoo-openapi.generated.json

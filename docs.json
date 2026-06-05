@@ -1,16 +1,62 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "theme": "mint",
-  "name": "Mosoo API",
-  "description": "Developer documentation for calling published Mosoo Agents.",
+  "name": "mosoo API",
+  "description": "Developer documentation for calling published mosoo Agents.",
   "colors": {
-    "primary": "#086030"
+    "primary": "#3A6E0E",
+    "light": "#6FD305",
+    "dark": "#498C07"
   },
   "logo": {
-    "light": "/images/brand/logo-api-onlight.svg",
-    "dark": "/images/brand/logo-api-ondark.svg"
+    "light": "/images/brand/logo-wordmark-onlight.svg",
+    "dark": "/images/brand/logo-wordmark-ondark.svg",
+    "href": "https://mosoo.ai"
   },
   "favicon": "/images/brand/favicon.svg",
+  "appearance": {
+    "default": "light"
+  },
+  "fonts": {
+    "heading": {
+      "family": "DM Sans",
+      "weight": 500
+    },
+    "body": {
+      "family": "Hanken Grotesk",
+      "weight": 400
+    }
+  },
+  "icons": {
+    "library": "lucide"
+  },
+  "background": {
+    "color": {
+      "light": "#FBFBFC",
+      "dark": "#090B0A"
+    }
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs",
+    "codeblocks": "system"
+  },
+  "navbar": {
+    "links": [
+      {
+        "label": "Platform",
+        "href": "https://mosoo.ai"
+      },
+      {
+        "type": "github",
+        "href": "https://github.com/Yevanchen/groots-docs"
+      }
+    ],
+    "primary": {
+      "type": "button",
+      "label": "Book a demo",
+      "href": "https://mosoo.ai"
+    }
+  },
   "api": {
     "examples": {
       "prefill": true
@@ -27,11 +73,11 @@
             "icon": "code",
             "groups": [
               {
-                "group": "Start",
+                "group": "Get started",
                 "pages": ["index", "quickstart", "auth-and-access"]
               },
               {
-                "group": "API Reference",
+                "group": "API reference",
                 "openapi": "mosoo-openapi.generated.json"
               }
             ]
@@ -60,7 +106,7 @@
                 "pages": ["zh-Hans/index", "zh-Hans/quickstart", "zh-Hans/auth-and-access"]
               },
               {
-                "group": "API Reference",
+                "group": "API 参考",
                 "openapi": "mosoo-openapi.generated.json"
               }
             ]

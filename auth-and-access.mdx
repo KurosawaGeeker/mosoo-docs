@@ -5,7 +5,7 @@ description: "How caller tokens, published Agent access, attribution, and owner 
 
 # Authentication and access
 
-The Mosoo API separates **who is calling** from **which published Agent is allowed to run**.
+The mosoo API separates **who is calling** from **which published Agent is allowed to run**.
 
 Every request uses a bearer token:
 
@@ -13,7 +13,7 @@ Every request uses a bearer token:
 Authorization: Bearer grt_pat_...
 ```
 
-The token identifies the caller. The `agentId` identifies the published Agent. Mosoo checks both before it creates or changes a Thread.
+The token identifies the caller. The `agentId` identifies the published Agent. mosoo checks both before it creates or changes a Thread.
 
 ## Token types
 
@@ -27,7 +27,7 @@ The token identifies the caller. The `agentId` identifies the published Agent. M
 </Columns>
 
 <Warning>
-  Service tokens are not channel connection credentials. Slack, Lark, Discord, Telegram, WeChat, and other channel setup stays in Mosoo.
+  Service tokens are not channel connection credentials. Slack, Lark, Discord, Telegram, WeChat, and other channel setup stays in mosoo.
 </Warning>
 
 ## Published Agent access
@@ -48,11 +48,11 @@ API access is available only after an Agent is configured and published. A valid
 | Invited-only | The Agent owner, explicitly invited collaborators, and allowed Service tokens. |
 | Selected Agent service access | Organization Service tokens that explicitly include this published Agent. |
 
-Having a token is not enough. If the caller does not pass the Agent access check, Mosoo returns `403 Forbidden`.
+Having a token is not enough. If the caller does not pass the Agent access check, mosoo returns `403 Forbidden`.
 
 ## Attribution and execution
 
-Mosoo records the API caller for access checks, attribution, audit logs, and Thread visibility.
+mosoo records the API caller for access checks, attribution, audit logs, and Thread visibility.
 
 Runs still use the published Agent owner's configured capabilities. The API caller does not become the Agent owner, change the Agent's model provider, or supply provider credentials in the request.
 
@@ -76,7 +76,7 @@ For Human PAT calls, the caller is the token owner. For Organization Service tok
 
 ## Token lifecycle
 
-Create and revoke tokens from Mosoo. Revoking a token blocks future API requests from that token; it does not delete existing Threads.
+Create and revoke tokens from mosoo. Revoking a token blocks future API requests from that token; it does not delete existing Threads.
 
 Use separate tokens for separate systems when possible:
 

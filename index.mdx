@@ -1,33 +1,62 @@
 ---
-title: "Mosoo API"
-description: "Call published Mosoo Agents from your own application."
+title: "Call mosoo Agents"
+description: "Start a published mosoo Agent from your app, send it work, and read back the result."
+mode: "custom"
 ---
 
-# Build on published Mosoo Agents
-
-Use the Mosoo API to call an Agent after it has been configured and published in Mosoo. Your application provides a caller token and the published Agent's `agentId`; Mosoo starts a Thread, runs the Agent, and exposes the public events and files for that Thread.
-
-This is the same integration surface behind the **API Access** entry in the Agent publish menu.
-
-<Note>
-  The API only works with published Agents. Agent setup, model provider connections, and channel bindings are managed in Mosoo before you call these endpoints.
-</Note>
-
-<Columns cols={3}>
-  <Card title="1. Publish an Agent" icon="bot">
-    Configure the Agent in Mosoo, connect its model provider, and publish it so it receives an `agentId`.
-  </Card>
-  <Card title="2. Create a token" icon="key-round">
-    Use a Human PAT for user-owned calls or an Organization Service token for server-side jobs.
-  </Card>
-  <Card title="3. Start a Thread" icon="messages-square">
-    Create a Thread with an initial message, then send events, attach files, and read results.
-  </Card>
-</Columns>
+<div className="mosoo-hero">
+  <div className="mosoo-hero-copy">
+    <div className="mosoo-eyebrow">API docs</div>
+    <h1>Call mosoo Agents from your app</h1>
+    <p>
+      Publish an Agent in mosoo, then let your product start work for it through
+      the API. Send messages, attach files, and read replies and status back
+      from your own system.
+    </p>
+    <div className="mosoo-hero-actions">
+      <a className="mosoo-button mosoo-button-dark" href="/quickstart">Start quickstart</a>
+      <a className="mosoo-button mosoo-button-outline" href="/api-reference/create-a-thread-for-a-published-agent">View API reference</a>
+    </div>
+    <div className="mosoo-note">
+      The API does not configure Agents. Set up and publish the Agent in mosoo first,
+      then use the API to start and continue work with that published Agent.
+    </div>
+  </div>
+  <div className="mosoo-hero-panel" aria-label="Thread creation flow">
+    <div className="mosoo-panel-top">
+      <span className="mosoo-method">POST</span>
+      <code>/agents/&#123;agentId&#125;/threads</code>
+    </div>
+    <div className="mosoo-flow">
+      <div className="mosoo-flow-row">
+        <span className="mosoo-flow-index">1</span>
+        <div>
+          <div className="mosoo-flow-title">Publish the Agent</div>
+          <p>Finish setup in mosoo and copy the <code>agentId</code> from API access.</p>
+        </div>
+      </div>
+      <div className="mosoo-flow-row">
+        <span className="mosoo-flow-index">2</span>
+        <div>
+          <div className="mosoo-flow-title">Authorize your app</div>
+          <p>Create a token that can call this published Agent.</p>
+        </div>
+      </div>
+      <div className="mosoo-flow-row">
+        <span className="mosoo-flow-index">3</span>
+        <div>
+          <div className="mosoo-flow-title">Start a Thread</div>
+          <p>Send the first message and keep reading or adding updates.</p>
+        </div>
+      </div>
+    </div>
+    <span className="mosoo-panel-mark" aria-hidden="true"></span>
+  </div>
+</div>
 
 ## First request
 
-Create a Thread by combining your access token with the published Agent ID.
+This request starts one new piece of work for a published Agent. Replace the token and Agent ID with your own values.
 
 ```bash
 curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
@@ -48,66 +77,77 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
   }'
 ```
 
-The response includes a `thread.id` and the first `run`. Use that Thread ID for follow-up messages, event reads, file attachment, and lifecycle actions.
+The response includes a `thread.id`. Save it. You use the same Thread ID to send follow-up messages, attach files, read the Agent's replies, or archive the work when it is done.
 
 <Card title="Run the full quickstart" icon="rocket" horizontal href="/quickstart">
-  Set environment variables, create a Thread, send another user message, and read the event log.
+  Set environment variables, create a Thread, send another message, and read the Agent's response.
 </Card>
 
-## Core concepts
+<div className="mosoo-section">
+  <h2>Core concepts</h2>
+  <div className="mosoo-grid two">
+    <div className="mosoo-card">
+      <div className="mosoo-card-title">Published Agent</div>
+      <p>The Agent your app is allowed to call. It must already be published in mosoo.</p>
+    </div>
+    <div className="mosoo-card">
+      <div className="mosoo-card-title">Caller token</div>
+      <p>The API token your app sends with each request. It proves who is calling and which Agents it can use.</p>
+    </div>
+    <div className="mosoo-card">
+      <div className="mosoo-card-title">Thread</div>
+      <p>One conversation or job with the Agent. Keep the Thread ID so your app can continue the same work later.</p>
+    </div>
+    <div className="mosoo-card">
+      <div className="mosoo-card-title">Event log</div>
+      <p>The list of messages, status updates, file changes, and Agent replies your app can read.</p>
+    </div>
+  </div>
+</div>
 
-<Columns cols={2}>
-  <Card title="Published Agent" icon="box">
-    The callable Agent identity. Copy its `agentId` from the Agent's API Access panel after publishing.
-  </Card>
-  <Card title="Caller token" icon="badge-check">
-    A Human PAT or Organization Service token. The token identifies the caller; it does not change which published Agent is run or how that Agent is configured.
-  </Card>
-  <Card title="Thread" icon="message-circle">
-    The conversation container created through the API. Threads track messages, files, run status, attribution, and lifecycle state.
-  </Card>
-  <Card title="Events" icon="activity">
-    The stable public log for API consumers. Send user messages or permission decisions, then read Agent-visible results from the Thread event list.
-  </Card>
-</Columns>
+<div className="mosoo-section">
+  <h2>What you can build</h2>
+  <p>The API is useful when Agent work should start from something outside mosoo:</p>
+  <ul>
+    <li>Open a support ticket and ask an Agent to triage it.</li>
+    <li>Start an Agent when an order, alert, or scheduled job appears.</li>
+    <li>Attach a brief, screenshot, log, or customer file before the Agent starts.</li>
+    <li>Show the Agent's replies and progress inside your own product.</li>
+    <li>Match mosoo Threads to your own records with <code>client_external_ref</code>.</li>
+  </ul>
+</div>
 
-## What you can build
+<div className="mosoo-section">
+  <h2>API capabilities</h2>
+  <div className="mosoo-grid two">
+    <a className="mosoo-card mosoo-card-link" href="/api-reference/create-a-thread-for-a-published-agent">
+      <div className="mosoo-card-title">Create and list Threads</div>
+      <p>Start new Agent work and list the Threads your token can see.</p>
+    </a>
+    <a className="mosoo-card mosoo-card-link" href="/api-reference/send-user-messages-permission-decisions-or-interrupts-to-a-thread">
+      <div className="mosoo-card-title">Send updates and read replies</div>
+      <p>Send another message, respond to a permission request, or read the latest Thread events.</p>
+    </a>
+    <a className="mosoo-card mosoo-card-link" href="/api-reference/add-a-thread-file">
+      <div className="mosoo-card-title">Attach files</div>
+      <p>Add files the Agent should use, then list or remove them when needed.</p>
+    </a>
+    <a className="mosoo-card mosoo-card-link" href="/api-reference/archive-a-thread">
+      <div className="mosoo-card-title">Close out work</div>
+      <p>Retrieve, archive, unarchive, or delete a Thread when your integration is finished with it.</p>
+    </a>
+  </div>
+</div>
 
-Use the API when a published Agent should become part of another product or workflow:
+## Access in plain terms
 
-- Start an Agent from your own server when a ticket, order, alert, or job appears.
-- Project work to a user through `attributed_user_id` when an Organization Service token is allowed to do so.
-- Attach files to a Thread before or during a run.
-- Poll the public event log for Agent messages, tool status, file changes, usage updates, and run completion.
-- Keep external systems in sync with `client_external_ref` and `Idempotency-Key`.
+Every API request must pass two checks:
 
-## API capabilities
+- The Agent must be published and have API access enabled.
+- The token must be valid and allowed to call that Agent.
 
-<Columns cols={2}>
-  <Card title="Create and list Threads" icon="list-tree" href="/api-reference/create-a-thread-for-a-published-agent">
-    `POST /agents/{agentId}/threads` creates a Thread and initial run. `GET /agents/{agentId}/threads` lists Threads visible to the caller.
-  </Card>
-  <Card title="Send and read events" icon="send" href="/api-reference/send-user-messages-permission-decisions-or-interrupts-to-a-thread">
-    `POST /threads/{threadId}/events` sends user messages, permission decisions, or interrupts. `GET /threads/{threadId}/events` reads the public event log.
-  </Card>
-  <Card title="Attach files" icon="paperclip" href="/api-reference/add-a-thread-file">
-    Add, list, and remove Thread files. API-added files are attachments; Agent-produced files are returned as artifacts.
-  </Card>
-  <Card title="Manage lifecycle" icon="archive" href="/api-reference/archive-a-thread">
-    Retrieve, archive, unarchive, or delete a Thread when your integration no longer needs it active.
-  </Card>
-</Columns>
-
-## Access model
-
-Every request is evaluated against the published Agent and the caller token:
-
-- The Agent must exist, be published, and expose API access.
-- The caller token must be valid and not revoked.
-- Human callers must still pass Organization membership and Agent access checks.
-- Organization Service tokens must be explicitly allowed to call selected published Agents.
-- Runs use the published Agent owner's configured capabilities.
+The token does not bring its own model settings or channel credentials. The Agent still runs with the configuration chosen by its mosoo owner.
 
 <Card title="Understand tokens and access" icon="shield-check" horizontal href="/auth-and-access">
-  Read how Human PATs, Organization Service tokens, Agent access modes, attribution, and owner settings fit together.
+  See which token type to use and how Agent permissions are checked.
 </Card>

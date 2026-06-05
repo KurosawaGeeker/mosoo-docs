@@ -1,0 +1,403 @@
+@import url("https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Hanken+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap");
+
+:root {
+  --mosoo-green-50: #f4fce4;
+  --mosoo-green-100: #e7f8c4;
+  --mosoo-green-200: #d3f195;
+  --mosoo-green-500: #6fd305;
+  --mosoo-green-700: #498c07;
+  --mosoo-green-800: #3a6e0e;
+  --mosoo-ink-950: #08090a;
+  --mosoo-ink-900: #1c2024;
+  --mosoo-ink-800: #2b3036;
+  --mosoo-ink-700: #3d434b;
+  --mosoo-ink-600: #515860;
+  --mosoo-ink-500: #656c75;
+  --mosoo-ink-200: #d2d7dd;
+  --mosoo-ink-150: #dfe3e8;
+  --mosoo-ink-100: #e9ecf0;
+  --mosoo-ink-50: #f4f6f8;
+  --mosoo-paper: #fbfbfc;
+  --mosoo-surface: #ffffff;
+  --mosoo-font-display: "DM Sans", "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --mosoo-font-sans: "Hanken Grotesk", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  --mosoo-font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --mosoo-shadow-sm: 0 1px 3px rgba(15, 20, 12, 0.06), 0 1px 2px rgba(15, 20, 12, 0.04);
+  --mosoo-shadow-md: 0 4px 12px rgba(15, 20, 12, 0.08), 0 2px 4px rgba(15, 20, 12, 0.04);
+}
+
+html {
+  background: var(--mosoo-paper);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background:
+    linear-gradient(90deg, rgba(28, 32, 36, 0.035) 1px, transparent 1px) 0 0 / 88px 100%,
+    var(--mosoo-paper);
+  color: var(--mosoo-ink-900);
+  font-family: var(--mosoo-font-sans);
+  letter-spacing: 0;
+}
+
+#navbar {
+  background: rgba(255, 255, 255, 0.84);
+  border-bottom: 1px solid var(--mosoo-ink-100);
+  backdrop-filter: blur(14px);
+}
+
+h1,
+h2,
+h3,
+h4 {
+  color: var(--mosoo-ink-950);
+  font-family: var(--mosoo-font-display);
+  letter-spacing: -0.018em;
+}
+
+p,
+li,
+td {
+  color: var(--mosoo-ink-700);
+  line-height: 1.68;
+}
+
+a {
+  color: var(--mosoo-green-800);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+code,
+pre {
+  font-family: var(--mosoo-font-mono);
+}
+
+pre {
+  border: 1px solid var(--mosoo-ink-100);
+  border-radius: 12px;
+  box-shadow: var(--mosoo-shadow-sm);
+}
+
+table {
+  border-color: var(--mosoo-ink-100);
+}
+
+.mosoo-hero {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(320px, 0.9fr);
+  gap: clamp(28px, 5vw, 64px);
+  align-items: stretch;
+  left: 50%;
+  width: min(calc(100vw - 48px), 1440px);
+  margin: 8px 0 44px;
+  margin-right: auto;
+  margin-left: auto;
+  transform: translateX(-50%);
+  padding: clamp(32px, 6vw, 72px);
+  overflow: hidden;
+  border: 1px solid var(--mosoo-ink-100);
+  border-radius: 18px;
+  background:
+    linear-gradient(90deg, rgba(28, 32, 36, 0.045) 1px, transparent 1px) 0 0 / 72px 100%,
+    linear-gradient(180deg, #ffffff 0%, #fbfbfc 100%);
+  box-shadow: var(--mosoo-shadow-md);
+}
+
+main > :not(.mosoo-hero) {
+  width: min(100% - 48px, 920px);
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.mosoo-hero-copy,
+.mosoo-hero-panel {
+  position: relative;
+  z-index: 1;
+}
+
+.mosoo-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 18px;
+  color: var(--mosoo-ink-500);
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.mosoo-eyebrow::before {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--mosoo-green-500);
+  content: "";
+}
+
+.mosoo-hero h1 {
+  max-width: 760px;
+  margin: 0;
+  color: var(--mosoo-ink-950);
+  font-size: clamp(2.5rem, 6vw, 4.65rem);
+  font-weight: 500;
+  letter-spacing: -0.035em;
+  line-height: 1.04;
+}
+
+.mosoo-hero p {
+  max-width: 680px;
+  margin: 22px 0 0;
+  color: var(--mosoo-ink-700);
+  font-size: clamp(1rem, 2vw, 1.18rem);
+}
+
+.mosoo-hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.mosoo-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 10px 16px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.mosoo-button:hover {
+  transform: translateY(-1px);
+}
+
+.mosoo-button-dark {
+  background: var(--mosoo-ink-900);
+  color: #ffffff;
+}
+
+.mosoo-button-dark:hover {
+  background: var(--mosoo-ink-800);
+  color: #ffffff;
+}
+
+.mosoo-button-outline {
+  border: 1px solid var(--mosoo-ink-200);
+  background: rgba(255, 255, 255, 0.72);
+  color: var(--mosoo-ink-900);
+}
+
+.mosoo-button-outline:hover {
+  border-color: var(--mosoo-ink-900);
+  color: var(--mosoo-ink-950);
+}
+
+.mosoo-hero-panel {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+  padding: 20px;
+  border: 1px solid var(--mosoo-ink-100);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.88);
+  box-shadow: var(--mosoo-shadow-sm);
+}
+
+.mosoo-panel-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--mosoo-ink-100);
+}
+
+.mosoo-method {
+  display: inline-flex;
+  align-items: center;
+  min-height: 24px;
+  padding: 3px 8px;
+  border-radius: 6px;
+  background: var(--mosoo-green-100);
+  color: var(--mosoo-green-800);
+  font-family: var(--mosoo-font-mono);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.mosoo-panel-top code,
+.mosoo-flow code {
+  color: var(--mosoo-ink-800);
+  font-size: 13px;
+}
+
+.mosoo-flow {
+  display: grid;
+  gap: 12px;
+  margin-top: 18px;
+}
+
+.mosoo-flow-row {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 12px;
+  align-items: start;
+}
+
+.mosoo-flow-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 6px;
+  background: var(--mosoo-green-50);
+  color: var(--mosoo-green-800);
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.mosoo-flow-title,
+.mosoo-card-title {
+  margin: 0;
+  color: var(--mosoo-ink-900);
+  font-family: var(--mosoo-font-display);
+  font-size: 16px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.mosoo-flow p,
+.mosoo-card p {
+  margin: 5px 0 0;
+  color: var(--mosoo-ink-600);
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.mosoo-panel-mark {
+  display: block;
+  width: 44px;
+  height: 44px;
+  margin-top: auto;
+  background: url("/images/brand/logo-mark.svg") center bottom / contain no-repeat;
+}
+
+.mosoo-section {
+  margin: 44px 0;
+}
+
+.mosoo-section h2 {
+  margin-bottom: 14px;
+}
+
+.mosoo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin: 18px 0 28px;
+}
+
+.mosoo-grid.two {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.mosoo-card {
+  display: block;
+  min-height: 148px;
+  padding: 20px;
+  border: 1px solid var(--mosoo-ink-100);
+  border-radius: 16px;
+  background: var(--mosoo-surface);
+  box-shadow: var(--mosoo-shadow-sm);
+  text-decoration: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease;
+}
+
+.mosoo-card:hover {
+  border-color: var(--mosoo-ink-200);
+  box-shadow: var(--mosoo-shadow-md);
+  transform: translateY(-2px);
+}
+
+.mosoo-card-link .mosoo-card-title {
+  color: var(--mosoo-green-800);
+}
+
+.mosoo-note {
+  margin: 24px 0 0;
+  padding: 14px 16px;
+  border: 1px solid var(--mosoo-ink-100);
+  border-radius: 12px;
+  background: var(--mosoo-paper);
+  color: var(--mosoo-ink-700);
+  font-size: 14.5px;
+  line-height: 1.6;
+}
+
+.mosoo-callout {
+  margin: 18px 0;
+  padding: 16px 18px;
+  border: 1px solid var(--mosoo-green-200);
+  border-radius: 12px;
+  background: var(--mosoo-green-50);
+  color: var(--mosoo-ink-700);
+}
+
+@media (max-width: 900px) {
+  .mosoo-hero,
+  .mosoo-grid,
+  .mosoo-grid.two {
+    grid-template-columns: 1fr;
+  }
+
+  .mosoo-hero {
+    left: auto;
+    width: 100%;
+    transform: none;
+    padding: 28px;
+  }
+}
+
+@media (max-width: 560px) {
+  body {
+    background: var(--mosoo-paper);
+  }
+
+  .mosoo-hero {
+    margin-top: 0;
+    padding: 22px;
+    border-radius: 14px;
+  }
+
+  main > :not(.mosoo-hero) {
+    width: calc(100% - 32px);
+  }
+
+  .mosoo-hero h1 {
+    font-size: 2.4rem;
+  }
+
+  .mosoo-button {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
