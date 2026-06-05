@@ -78,23 +78,10 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
 
 ## 核心概念
 
-<Columns cols={2}>
-  <Card title="Agent" icon="user-astronaut">
-    你在 Mosoo 中配置的智能体，可以在 Agents 面板和 Agent 详情页获取它的`agentId`。
-  </Card>
-
-  <Card title="API token" icon="key">
-    是调用 Mosoo API 的身份凭证，用来证明调用者是谁，并决定其对 Agent 和 Thread 的可见性。
-  </Card>
-
-  <Card title="Thread" icon="microblog">
-    API 创建的对话容器。Thread 记录历史消息、文件、运行状态、和 Agent 的生命周期状态。
-  </Card>
-
-  <Card title="Event" icon="unity">
-    Thread 中的输入、输出、工具、文件、运行状态和用量这些公开可见变化，都是一种 Event。
-  </Card>
-</Columns>
+- **Agent**：你在 Mosoo 中配置的智能体，可以在 Agents 面板和 Agent 详情页获取它的 `agentId`。
+- **API token**：调用 Mosoo API 的身份凭证，用来证明调用者是谁，并决定其对 Agent 和 Thread 的可见性。
+- **Thread**：API 创建的对话容器。Thread 记录历史消息、文件、运行状态和 Agent 的生命周期状态。
+- **Event**：Thread 中的输入、输出、工具、文件、运行状态和用量这些公开可见变化，都是一种 Event。
 
 ## 访问模型
 
