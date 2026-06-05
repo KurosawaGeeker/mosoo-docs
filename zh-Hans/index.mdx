@@ -3,26 +3,47 @@ title: "Mosoo API"
 description: "在你的应用中通过 API 集成并调用发布的 Mosoo Agent。"
 ---
 
+export const mosooDevOrigin = "http://localhost:5173";
+export const mosooProdOrigin = "https://mosoo.ai";
+export const mosooOrigin =
+  typeof window !== "undefined" && window.location.hostname === "localhost"
+    ? mosooDevOrigin
+    : mosooProdOrigin;
+export const publishAgentPath = "/agent";
+export const apiTokenPath = "/settings/access-tokens";
+export const createThreadPath = "/api/v1/agents/{agentId}/threads";
+
 # 基于Mosoo Agent 集成开发
 
 你的应用提供 API token 和已发布 Agent 的 `agentId`；Mosoo 会创建 Thread、启动 Agent，并向 API 调用方开放这个 Thread 的公开事件和文件。
 
 这就是 Agent 发布菜单里 **API 接入** 对应的集成能力。
 
+## 可以用来做什么
+
+Mosoo API 让你把已经发布的 Agent 接入自己的应用。你可以把 Mosoo 托管的 Agent 当成一个可调用的后端：你的系统发送输入，Agent 在 Mosoo 的运行环境中处理任务，然后你再读取回复、状态和文件结果。
+
+你可以用它来：
+
+- 做自己的聊天机器人、移动 App 或网页应用，后端调用 Mosoo Agent。
+- 给定制应用接入一个已经配置好的 Agent，让它处理用户请求、文件和上下文。
+- 用代码协调多个 Agent，把它们组合成一个协作工作台或自动化流程。
+- 用定时任务、外部事件或自己的服务触发 Agent，让它持续处理某类工作。
+
 <Note>
   API 只适用于已发布的 Agent。Agent 配置、模型服务商连接和渠道绑定都需要先在 Mosoo 中完成。
 </Note>
 
 <Columns cols={3}>
-  <Card title="发布 Agent" icon="1">
+  <Card title="发布 Agent" icon="1" href={`${mosooOrigin}${publishAgentPath}`}>
     在 Mosoo 中连接模型服务商，配置并**发布 Agent **以获得 `agentId`。
   </Card>
 
-  <Card title="创建 API token" icon="2">
+  <Card title="创建 API token" icon="2" href={`${mosooOrigin}${apiTokenPath}`}>
     在用户头像- settings - API tokens 创建标识你身份的 `API token`
   </Card>
 
-  <Card title="创建 Thread" icon="3">
+  <Card title="创建 Thread" icon="3" href={`${mosooOrigin}${createThreadPath}`}>
     携带 `API token `\+`agentId` 通过API 创建 Thread，发送事件、文件并读取结果。
   </Card>
 </Columns>
@@ -75,15 +96,6 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
     Thread 中的输入、输出、工具、文件、运行状态和用量这些公开可见变化，都是一种 Event。
   </Card>
 </Columns>
-
-## 可以用来做什么
-
-当你希望把 Agent 接入自己的产品或工作流时：
-
-- 当工单、订单、告警或任务出现时，从你的后端启动 Agent。
-- 在运行前或运行过程中给 Thread 附加文件。
-- 轮询公开事件日志，读取 Agent 消息、工具状态、文件变化、用量更新和运行完成状态。
-- 使用 `client_external_ref` 和 `Idempotency-Key` 让外部系统与 Mosoo 保持一致。
 
 ## API 能力范围
 
