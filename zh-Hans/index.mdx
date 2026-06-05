@@ -3,17 +3,6 @@ title: "Mosoo API"
 description: "在你的应用中通过 API 集成并调用 Mosoo Agent。"
 ---
 
-export const mosooDevOrigin = "http://localhost:5173";
-export const mosooProdOrigin = "https://mosoo.ai";
-export const mosooOrigin =
-  typeof window !== "undefined" && window.location.hostname === "localhost"
-    ? mosooDevOrigin
-    : mosooProdOrigin;
-export const publishAgentPath = "/agent";
-export const apiTokenPath = "/settings/access-tokens";
-
-你的应用提供 API token 和 Agent 的 `agentId`；Mosoo 会创建 Thread、启动 Agent，并向 API 调用方开放这个 Thread 的公开事件和文件。
-
 ## 可以用来做什么
 
 <Columns cols={2}>
@@ -38,17 +27,23 @@ export const apiTokenPath = "/settings/access-tokens";
   API 只适用于已发布的 Agent。Agent 配置、模型服务商连接和渠道绑定都需要先在 Mosoo 中完成。
 </Note>
 
+## 该怎么做？
+
 <Columns cols={3}>
-  <Card title="发布 Agent" icon="1" href={`${mosooOrigin}${publishAgentPath}`}>
-    在 Mosoo 中连接模型服务商，配置并**发布 Agent **以获得 `agentId`。
+  <Card title="发布 Agent" icon="1" href="`${mosooOrigin}${publishAgentPath}`">
+    在 Mosoo 中连接模型服务商，配置并发布 Agent 以获得 `agentId`。
   </Card>
 
-  <Card title="创建 API token" icon="2" href={`${mosooOrigin}${apiTokenPath}`}>
-    在用户头像- settings - API tokens 创建标识你身份的 `API token`
+  <Card title="创建 API token" icon="2" href="`${mosooOrigin}${apiTokenPath}`">
+    在用户头像- settings - API tokens 创建代表你身份的 `API token`
   </Card>
 
   <Card title="创建 Thread" icon="3" href="/api-reference/create-a-thread-for-a-published-agent">
     携带 `API token `\+`agentId` 通过API 创建 Thread，发送事件、文件并读取结果。
+  </Card>
+
+  <Card title="集成到你的应用" icon="4">
+    将 Mosoo Agent 集成到你的应用中。
   </Card>
 </Columns>
 
