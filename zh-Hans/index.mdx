@@ -20,12 +20,23 @@ export const apiTokenPath = "/settings/access-tokens";
 
 Mosoo API 让你把已经发布的 Agent 接入自己的应用。你可以把 Mosoo 托管的 Agent 当成一个可调用的后端：你的系统发送输入，Agent 在 Mosoo 的运行环境中处理任务，然后你再读取回复、状态和文件结果。
 
-你可以用它来：
+<Columns cols={2}>
+  <Card title="聊天机器人和应用后端" icon="comments">
+    为聊天机器人、移动 App 或网页应用接入 Mosoo Agent，让你的后端调用已发布 Agent。
+  </Card>
 
-- 做自己的聊天机器人、移动 App 或网页应用，后端调用 Mosoo Agent。
-- 给定制应用接入一个已经配置好的 Agent，让它处理用户请求、文件和上下文。
-- 用代码协调多个 Agent，把它们组合成一个协作工作台或自动化流程。
-- 用定时任务、外部事件或自己的服务触发 Agent，让它持续处理某类工作。
+  <Card title="定制应用能力" icon="sliders">
+    给定制应用接入一个已经配置好的 Agent，让它处理用户请求、文件和上下文。
+  </Card>
+
+  <Card title="多 Agent 协作" icon="people-group">
+    用代码协调多个 Agent，把它们组合成一个协作工作台或自动化流程。
+  </Card>
+
+  <Card title="持续触发的任务" icon="clock">
+    用定时任务、外部事件或自己的服务触发 Agent，让它持续处理某类工作。
+  </Card>
+</Columns>
 
 <Note>
   API 只适用于已发布的 Agent。Agent 配置、模型服务商连接和渠道绑定都需要先在 Mosoo 中完成。
