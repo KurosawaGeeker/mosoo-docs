@@ -105,26 +105,6 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
   </Card>
 </Columns>
 
-## API 能力范围
-
-<Columns cols={2}>
-  <Card title="创建和列出 Threads" icon="list-tree" href="/api-reference/create-a-thread-for-a-published-agent">
-    `POST /agents/{agentId}/threads` 创建 Thread 和初始运行。`GET /agents/{agentId}/threads` 列出调用方可见的 Threads。
-  </Card>
-
-  <Card title="发送和读取事件" icon="send" href="/api-reference/send-user-messages-permission-decisions-or-interrupts-to-a-thread">
-    `POST /threads/{threadId}/events` 发送用户消息、权限决策或中断。`GET /threads/{threadId}/events` 读取公开事件日志。
-  </Card>
-
-  <Card title="文件管理" icon="paperclip" href="/api-reference/add-a-thread-file">
-    添加、列出和移除 Thread 文件。API 添加的文件是附件；Agent 生成的文件会作为产物文件返回。
-  </Card>
-
-  <Card title="管理 Thread 生命周期" icon="archive" href="/api-reference/archive-a-thread">
-    当集成不再需要 Thread 保持活跃时，可以读取、归档、恢复或删除 Thread。
-  </Card>
-</Columns>
-
 ## 访问模型
 
 每个请求都会同时校验已发布 Agent 和 API token：
