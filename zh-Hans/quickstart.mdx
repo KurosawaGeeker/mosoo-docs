@@ -13,7 +13,7 @@ description: "用 curl 为已发布的 Mosoo Agent 创建 Thread。"
 
 - 一个已经在 Mosoo 中发布的 Agent。
 - Agent API 接入面板里的 Agent ID。
-- 被允许调用这个 Agent 的 Human PAT 或 Organization Service token。
+- 被允许调用这个 Agent 的 API token。
 
 ```bash
 export MOSOO_API_TOKEN="grt_pat_..."
@@ -124,5 +124,4 @@ curl -X POST "https://mosoo.ai/api/v1/threads/$MOSOO_THREAD_ID/files" \
 - token 本身不会解锁所有 Agent。
 - Agent 必须已经发布。
 - 调用方必须通过组织成员和 Agent 访问检查。
-- Service token 必须显式选择允许调用的已发布 Agent。
 - 创建 Thread 和发送事件时建议使用 `Idempotency-Key` 来支持安全重试。

@@ -9,7 +9,7 @@
             }
           }
         },
-        "description": "The Thread state rejects this action, or an Idempotency-Key is already processing or was reused for a different request."
+        "description": "The Agent/session state rejects this action, or an Idempotency-Key is already processing or was reused for a different request."
       },
       "Forbidden": {
         "content": {
@@ -59,7 +59,7 @@
             }
           }
         },
-        "description": "The caller token exceeded the public API request budget for the current window.",
+        "description": "The API token exceeded the public API request budget for the current window.",
         "headers": {
           "Retry-After": {
             "description": "Seconds to wait before retrying the request.",
@@ -78,7 +78,7 @@
             }
           }
         },
-        "description": "A valid Human PAT or Service token is required."
+        "description": "A valid API token is required."
       }
     },
     "schemas": {
@@ -89,6 +89,9 @@
             "properties": {
               "attachmentIds": {
                 "items": {
+                  "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                  "format": "ulid",
+                  "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
                   "type": "string"
                 },
                 "type": "array"
@@ -141,9 +144,16 @@
             "additionalProperties": false,
             "properties": {
               "runId": {
-                "type": [
-                  "string",
-                  "null"
+                "oneOf": [
+                  {
+                    "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                    "format": "ulid",
+                    "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
+                    "type": "string"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "type": {
@@ -176,24 +186,17 @@
       "CreateThreadFileRequest": {
         "additionalProperties": false,
         "properties": {
-          "contentBase64": {
-            "description": "Base64-encoded file bytes, or a data URL.",
-            "maxLength": 13981272,
-            "type": "string"
-          },
-          "contentType": {
-            "maxLength": 255,
-            "type": "string"
-          },
-          "name": {
-            "maxLength": 255,
-            "type": "string"
+          "fileId": {
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "format": "ulid",
+            "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
+            "type": "string",
+            "maxLength": 26,
+            "minLength": 1
           }
         },
         "required": [
-          "contentBase64",
-          "contentType",
-          "name"
+          "fileId"
         ],
         "type": "object"
       },
@@ -276,6 +279,9 @@
             ]
           },
           "id": {
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "format": "ulid",
+            "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string"
           },
           "occurredAt": {
@@ -380,22 +386,22 @@
       "CreateThreadRequest": {
         "additionalProperties": false,
         "properties": {
-          "attributed_user_id": {
-            "type": "string"
-          },
           "client_external_ref": {
             "maxLength": 255,
             "type": "string"
           },
           "files": {
-            "description": "File handles uploaded by the same Human PAT caller. Organization Service tokens cannot attach files until service-token file uploads are available.",
+            "description": "Draft file handles uploaded by the same API token caller.",
             "items": {
               "additionalProperties": false,
               "properties": {
                 "file_id": {
-                  "maxLength": 255,
-                  "minLength": 1,
-                  "type": "string"
+                  "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                  "format": "ulid",
+                  "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
+                  "type": "string",
+                  "maxLength": 26,
+                  "minLength": 1
                 }
               },
               "required": [
@@ -441,9 +447,7 @@
             "type": "object"
           }
         },
-        "required": [
-          "input"
-        ],
+        "required": [],
         "type": "object"
       },
       "CreateThreadResponse": {
@@ -453,7 +457,14 @@
             "$ref": "#/components/schemas/ThreadLinks"
           },
           "run": {
-            "$ref": "#/components/schemas/RunSummary"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RunSummary"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "thread": {
             "$ref": "#/components/schemas/ThreadSummary"
@@ -504,6 +515,9 @@
             "type": "string"
           },
           "id": {
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "format": "ulid",
+            "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string"
           },
           "kind": {
@@ -569,6 +583,9 @@
         "additionalProperties": false,
         "properties": {
           "id": {
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "format": "ulid",
+            "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string"
           }
         },
@@ -581,12 +598,14 @@
         "additionalProperties": false,
         "properties": {
           "id": {
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "format": "ulid",
+            "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string"
           },
           "kind": {
             "enum": [
-              "human_pat",
-              "service_token"
+              "human_pat"
             ]
           }
         },
@@ -612,6 +631,9 @@
         "additionalProperties": false,
         "properties": {
           "agent_id": {
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "format": "ulid",
+            "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string"
           },
           "attributed_user": {
@@ -638,6 +660,9 @@
             "$ref": "#/components/schemas/ThreadCaller"
           },
           "id": {
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "format": "ulid",
+            "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string"
           },
           "kind": {
@@ -647,9 +672,16 @@
             ]
           },
           "last_run_id": {
-            "type": [
-              "string",
-              "null"
+            "oneOf": [
+              {
+                "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                "format": "ulid",
+                "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "source": {
@@ -705,6 +737,9 @@
             "type": "string"
           },
           "id": {
+            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "format": "ulid",
+            "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string"
           },
           "startedAt": {
@@ -769,21 +804,15 @@
     },
     "securitySchemes": {
       "publicApiBearer": {
-        "bearerFormat": "Mosoo Human PAT or Organization Service token",
-        "description": "Use Authorization: Bearer grt_pat_... for Human PAT calls or an Organization Service token for machine calls.",
-        "scheme": "bearer",
-        "type": "http"
-      },
-      "personalAccessToken": {
-        "bearerFormat": "Mosoo PAT",
-        "description": "Use Authorization: Bearer grt_pat_... . PATs identify an account and do not carry scopes.",
+        "bearerFormat": "Mosoo API token",
+        "description": "Use Authorization: Bearer grt_pat_... . API tokens identify an account and do not carry scopes.",
         "scheme": "bearer",
         "type": "http"
       }
     }
   },
   "info": {
-    "description": "Public HTTPS API for creating and retrieving Threads on published Mosoo Agents. Human PATs identify account callers; Organization Service tokens identify machine callers that are allowed to call selected published Agents. Runs use the published Agent owner's configured capabilities, and attribution controls which user the work is associated with.",
+    "description": "Public HTTPS API for creating and retrieving Threads on published Mosoo Agents. v1 resource identifiers are bare ULIDs, not prefixed IDs. API tokens identify the account caller. Runtime execution resolves the published Agent owner capabilities while the Thread is attributed to the token owner.",
     "title": "Mosoo Published Agent API",
     "version": "v1"
   },
@@ -791,17 +820,20 @@
   "paths": {
     "/agents/{agentId}/threads": {
       "get": {
-        "description": "Returns Threads created by the authenticated Personal Access Token caller.",
+        "description": "Returns Threads created by the authenticated API token caller.",
         "parameters": [
           {
-            "description": "Published Agent ID from the Agent's API Access panel.",
-            "example": "agent_01KQWXYVXF51M33M24VTA6SC7P",
+            "description": "Published Agent ID from the Agent's API Access panel. v1 IDs are bare ULIDs.",
+            "example": "01J00000000000000000000001",
             "in": "path",
             "name": "agentId",
             "required": true,
             "schema": {
+              "example": "01J00000000000000000000001",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
               "type": "string",
-              "x-default": "agent_01KQWXYVXF51M33M24VTA6SC7P"
+              "x-default": "01J00000000000000000000001"
             }
           },
           {
@@ -814,7 +846,7 @@
         ],
         "security": [
           {
-            "personalAccessToken": []
+            "publicApiBearer": []
           }
         ],
         "summary": "List Threads for a published Agent",
@@ -828,6 +860,7 @@
                       "items": {
                         "$ref": "#/components/schemas/ThreadSummary"
                       },
+                      "maxItems": 100,
                       "type": "array"
                     }
                   },
@@ -864,17 +897,20 @@
         }
       },
       "post": {
-        "description": "Creates a Thread and starts the initial Run. Human PAT callers are attributed to the PAT owner. Organization Service tokens may omit user attribution or pass attributed_user_id when the token is allowed to do so.",
+        "description": "Creates a Thread and the backing AgentSession. If input is present, Mosoo also queues the initial Run. If input is omitted, the Thread is immediately visible with IDLE status and no run. API token callers are attributed to the token owner.",
         "parameters": [
           {
-            "description": "Published Agent ID from the Agent's API Access panel.",
-            "example": "agent_01KQWXYVXF51M33M24VTA6SC7P",
+            "description": "Published Agent ID from the Agent's API Access panel. v1 IDs are bare ULIDs.",
+            "example": "01J00000000000000000000001",
             "in": "path",
             "name": "agentId",
             "required": true,
             "schema": {
+              "example": "01J00000000000000000000001",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
               "type": "string",
-              "x-default": "agent_01KQWXYVXF51M33M24VTA6SC7P"
+              "x-default": "01J00000000000000000000001"
             }
           },
           {
@@ -892,13 +928,19 @@
           "content": {
             "application/json": {
               "examples": {
+                "emptyThread": {
+                  "summary": "Create an empty Thread",
+                  "value": {
+                    "client_external_ref": "draft-empty-thread"
+                  }
+                },
                 "humanPatWithFile": {
-                  "summary": "Human PAT with an uploaded file",
+                  "summary": "Personal token with an uploaded file",
                   "value": {
                     "client_external_ref": "linear-ENG-123",
                     "files": [
                       {
-                        "file_id": "file_01KQX0V62MEXAMPLE7W6X3B2A"
+                        "file_id": "01J0000000000000000000000J"
                       }
                     ],
                     "input": {
@@ -912,30 +954,14 @@
                     }
                   }
                 },
-                "serviceTokenNoAttribution": {
-                  "summary": "Service token without human attribution",
+                "personalTokenBasic": {
+                  "summary": "Personal token",
                   "value": {
-                    "client_external_ref": "cron-nightly-check",
+                    "client_external_ref": "demo-thread-001",
                     "input": {
                       "content": [
                         {
-                          "text": "Run the nightly checklist.",
-                          "type": "text"
-                        }
-                      ],
-                      "type": "user.message"
-                    }
-                  }
-                },
-                "serviceTokenWithAttribution": {
-                  "summary": "Service token projecting work to a bound user",
-                  "value": {
-                    "attributed_user_id": "user_01KQX1BOUNDHUMAN7Z8",
-                    "client_external_ref": "support-ticket-182",
-                    "input": {
-                      "content": [
-                        {
-                          "text": "Triage this customer escalation.",
+                          "text": "Say hello from the API.",
                           "type": "text"
                         }
                       ],
@@ -963,7 +989,7 @@
               }
             }
           },
-          "required": true
+          "required": false
         },
         "summary": "Create a Thread for a published Agent",
         "responses": {
@@ -1014,21 +1040,23 @@
       "delete": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread.",
-            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
             "required": true,
             "schema": {
-              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "example": "01J00000000000000000000009",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
               "type": "string",
-              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+              "x-default": "01J00000000000000000000009"
             }
           }
         ],
         "security": [
           {
-            "personalAccessToken": []
+            "publicApiBearer": []
           }
         ],
         "summary": "Delete a Thread",
@@ -1077,15 +1105,17 @@
       "get": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread.",
-            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
             "required": true,
             "schema": {
-              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "example": "01J00000000000000000000009",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
               "type": "string",
-              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+              "x-default": "01J00000000000000000000009"
             }
           }
         ],
@@ -1129,21 +1159,23 @@
       "post": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread.",
-            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
             "required": true,
             "schema": {
-              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "example": "01J00000000000000000000009",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
               "type": "string",
-              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+              "x-default": "01J00000000000000000000009"
             }
           }
         ],
         "security": [
           {
-            "personalAccessToken": []
+            "publicApiBearer": []
           }
         ],
         "summary": "Archive a Thread",
@@ -1192,18 +1224,20 @@
     },
     "/threads/{threadId}/events": {
       "get": {
-        "description": "Returns the latest public event log entries for this Thread in chronological order. This is the stable public log for CLI and API consumers; it does not expose raw runtime payloads, transcript, diagnostics, or streaming.",
+        "description": "Returns the latest public event log entries for this Thread in chronological order. This is the stable snapshot read surface for CLI and API consumers; it does not expose raw runtime payloads, transcript, or diagnostics.",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread.",
-            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
             "required": true,
             "schema": {
-              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "example": "01J00000000000000000000009",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
               "type": "string",
-              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+              "x-default": "01J00000000000000000000009"
             }
           },
           {
@@ -1257,15 +1291,17 @@
       "post": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread.",
-            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
             "required": true,
             "schema": {
-              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "example": "01J00000000000000000000009",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
               "type": "string",
-              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+              "x-default": "01J00000000000000000000009"
             }
           },
           {
@@ -1299,7 +1335,7 @@
         },
         "security": [
           {
-            "personalAccessToken": []
+            "publicApiBearer": []
           }
         ],
         "summary": "Send user messages, permission decisions, or interrupts to a Thread",
@@ -1347,25 +1383,95 @@
         }
       }
     },
-    "/threads/{threadId}/files": {
+    "/threads/{threadId}/events/stream": {
       "get": {
+        "description": "Streams public Thread event log entries as Server-Sent Events. Each `thread.event` data payload uses the same ThreadEventLogEntry shape as GET /threads/{threadId}/events. The stream is for long-running consumer UX and does not expose raw runtime payloads, internal diagnostics, or private transcripts.",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread.",
-            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
             "required": true,
             "schema": {
-              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "example": "01J00000000000000000000009",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
               "type": "string",
-              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+              "x-default": "01J00000000000000000000009"
+            }
+          },
+          {
+            "description": "Maximum number of latest Thread events to return.",
+            "example": 100,
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "default": 100,
+              "maximum": 1000,
+              "minimum": 1,
+              "type": "integer"
+            }
+          }
+        ],
+        "summary": "Stream Thread events",
+        "responses": {
+          "200": {
+            "content": {
+              "text/event-stream": {
+                "example": ": connected\n\nevent: thread.event\nid: 01J00000000000000000000010\ndata: {\"id\":\"01J00000000000000000000010\",\"type\":\"run.started\",\"status\":\"completed\",\"content\":\"01J0000000000000000000000A\",\"occurredAt\":\"2026-05-19T00:00:01.000Z\",\"durationMs\":null,\"tokens\":null}\n\n",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Thread event stream."
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      }
+    },
+    "/threads/{threadId}/files": {
+      "get": {
+        "parameters": [
+          {
+            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "example": "01J00000000000000000000009",
+            "in": "path",
+            "name": "threadId",
+            "required": true,
+            "schema": {
+              "example": "01J00000000000000000000009",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
+              "type": "string",
+              "x-default": "01J00000000000000000000009"
             }
           }
         ],
         "security": [
           {
-            "personalAccessToken": []
+            "publicApiBearer": []
           }
         ],
         "summary": "List Thread files",
@@ -1378,7 +1484,7 @@
                     {
                       "committed": true,
                       "createdAt": "2026-05-19T00:02:00.000Z",
-                      "id": "file_01KQX0V62MEXAMPLE7W6X3B2A",
+                      "id": "01J0000000000000000000000J",
                       "kind": "attachment",
                       "mimeType": "text/plain",
                       "name": "brief.txt",
@@ -1417,24 +1523,26 @@
         }
       },
       "post": {
-        "description": "Adds a user-provided file to this Thread. The JSON request carries file bytes in contentBase64; Mosoo decodes and stores the file as a Thread attachment.",
+        "description": "Claims a ready draft file handle into this Thread. Upload file bytes through the files data plane first, then pass the resulting fileId here.",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread.",
-            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
             "required": true,
             "schema": {
-              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "example": "01J00000000000000000000009",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
               "type": "string",
-              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+              "x-default": "01J00000000000000000000009"
             }
           }
         ],
         "security": [
           {
-            "personalAccessToken": []
+            "publicApiBearer": []
           }
         ],
         "requestBody": {
@@ -1444,9 +1552,7 @@
                 "$ref": "#/components/schemas/CreateThreadFileRequest"
               },
               "example": {
-                "contentBase64": "SGVsbG8gZnJvbSBHcm9vdHMuCg==",
-                "contentType": "text/plain",
-                "name": "brief.txt"
+                "fileId": "01J0000000000000000000000J"
               }
             }
           },
@@ -1461,7 +1567,7 @@
                   "file": {
                     "committed": true,
                     "createdAt": "2026-05-19T00:02:00.000Z",
-                    "id": "file_01KQX0V62MEXAMPLE7W6X3B2A",
+                    "id": "01J0000000000000000000000J",
                     "kind": "attachment",
                     "mimeType": "text/plain",
                     "name": "brief.txt",
@@ -1503,32 +1609,37 @@
       "delete": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread.",
-            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
             "required": true,
             "schema": {
-              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "example": "01J00000000000000000000009",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
               "type": "string",
-              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+              "x-default": "01J00000000000000000000009"
             }
           },
           {
-            "description": "File ID returned by add or list Thread files.",
-            "example": "file_01KQX0V62MEXAMPLE7W6X3B2A",
+            "description": "File ID returned by add or list Thread files. v1 IDs are bare ULIDs.",
+            "example": "01J0000000000000000000000J",
             "in": "path",
             "name": "fileId",
             "required": true,
             "schema": {
+              "example": "01J0000000000000000000000J",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
               "type": "string",
-              "x-default": "file_01KQX0V62MEXAMPLE7W6X3B2A"
+              "x-default": "01J0000000000000000000000J"
             }
           }
         ],
         "security": [
           {
-            "personalAccessToken": []
+            "publicApiBearer": []
           }
         ],
         "summary": "Remove a Thread file",
@@ -1579,21 +1690,23 @@
       "post": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread.",
-            "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
             "required": true,
             "schema": {
-              "pattern": "^[0-9A-HJKMNP-TV-Z]{26}$",
+              "example": "01J00000000000000000000009",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
               "type": "string",
-              "x-default": "01ARZ3NDEKTSV4RRFFQ69G5FAV"
+              "x-default": "01J00000000000000000000009"
             }
           }
         ],
         "security": [
           {
-            "personalAccessToken": []
+            "publicApiBearer": []
           }
         ],
         "summary": "Unarchive a Thread",
@@ -1648,7 +1761,7 @@
   ],
   "servers": [
     {
-      "url": "https://mosoo.ai/api/v1"
+      "url": "http://localhost:8787/api/v1"
     }
   ]
 }

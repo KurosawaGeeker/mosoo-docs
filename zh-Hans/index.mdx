@@ -5,7 +5,7 @@ description: "在你的应用中通过 API 集成并调用已发布的 Mosoo Age
 
 # 基于已发布 Mosoo Agent 开发
 
-Mosoo API 用于在你的应用中调用**已发布**的 Mosoo Agent。你的应用提供调用方 token 和已发布 Agent 的 `agentId`；Mosoo 会创建 Thread、启动 Agent，并向 API 调用方开放这个 Thread 的公开事件和文件。
+Mosoo API 用于在你的应用中调用**已发布**的 Mosoo Agent。你的应用提供 API token 和已发布 Agent 的 `agentId`；Mosoo 会创建 Thread、启动 Agent，并向 API 调用方开放这个 Thread 的公开事件和文件。
 
 这就是 Agent 发布菜单里 **API 接入（API Access）** 入口对应的集成能力。
 
@@ -107,14 +107,13 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
 
 ## 访问模型
 
-每个请求都会同时校验已发布 Agent 和调用方 token：
+每个请求都会同时校验已发布 Agent 和 API token：
 
 - Agent 必须存在、已发布，并启用 API 接入。
-- 调用方 token 必须有效且未被撤销。
-- 使用 Human PAT 的调用方仍需通过组织成员和 Agent 访问检查。
-- Organization Service token 必须被显式允许调用指定的已发布 Agent。
+- API token 必须有效且未被撤销。
+- 调用方仍需通过组织成员和 Agent 访问检查。
 - 运行时会使用已发布 Agent 所有者配置的能力边界。
 
 <Card title="理解 token 和访问控制" icon="shield-check" horizontal href="/zh-Hans/auth-and-access">
-  了解 Human PAT、Organization Service token、Agent 访问路径、归因和所有者配置如何配合。
+  了解 API token、Agent 访问路径、归因和所有者配置如何配合。
 </Card>

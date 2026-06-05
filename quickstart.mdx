@@ -13,7 +13,7 @@ You need:
 
 - A published Agent in Mosoo.
 - The Agent ID from the Agent's API Access panel.
-- A Human PAT or Organization Service token that is allowed to call that Agent.
+- An API token that is allowed to call that Agent.
 
 ```bash
 export MOSOO_API_TOKEN="grt_pat_..."
@@ -124,5 +124,4 @@ curl -X POST "https://mosoo.ai/api/v1/threads/$MOSOO_THREAD_ID/files" \
 - A token alone does not unlock every Agent.
 - The Agent must be published.
 - The caller must pass Organization membership and Agent access checks.
-- Service tokens must select published Agents explicitly.
 - Use `Idempotency-Key` for retry-safe create-thread and send-events calls.

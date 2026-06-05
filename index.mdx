@@ -5,29 +5,40 @@ description: "Call published Mosoo Agents from your own application."
 
 # Build on published Mosoo Agents
 
-Use the Mosoo API to call an Agent after it has been configured and published in Mosoo. Your application provides a caller token and the published Agent's `agentId`; Mosoo starts a Thread, runs the Agent, and exposes the public events and files for that Thread.
+Use the Mosoo API to connect a published Mosoo Agent to your own application. Treat the Mosoo-hosted Agent as a callable intelligent backend: your system sends input, the Agent works inside its Mosoo runtime and workspace, and your app reads replies, status, and file results.
 
 This is the same integration surface behind the **API Access** entry in the Agent publish menu.
+
+## What you can build
+
+You can use it to:
+
+- Build a chatbot, mobile app, or web app with a Mosoo Agent behind it.
+- Add a configured Agent to a custom app so it can handle user requests, files, and context.
+- Coordinate multiple Agents with glue code and turn them into a collaborative workspace or automation flow.
+- Trigger an always-online Agent from schedules, external events, or your own service so it can handle work on demand.
 
 <Note>
   The API only works with published Agents. Agent setup, model provider connections, and channel bindings are managed in Mosoo before you call these endpoints.
 </Note>
+
+## Integration flow
 
 <Columns cols={3}>
   <Card title="1. Publish an Agent" icon="bot">
     Configure the Agent in Mosoo, connect its model provider, and publish it so it receives an `agentId`.
   </Card>
   <Card title="2. Create a token" icon="key-round">
-    Create a personal access token so your app backend can call the published Agent.
+    Create an API token so your app backend can call the published Agent.
   </Card>
   <Card title="3. Start a Thread" icon="messages-square">
-    Create a Thread with an initial message, then send events, attach files, and read results.
+    Create a Thread through the API, send user input or files to the Agent, then continue events and read results.
   </Card>
 </Columns>
 
 ## First request
 
-Create a Thread by combining your access token with the published Agent ID.
+Create a Thread by combining your API token with the published Agent ID.
 
 ```bash
 curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
@@ -60,8 +71,8 @@ The response includes a `thread.id` and the first `run`. Use that Thread ID for 
   <Card title="Published Agent" icon="box">
     The callable Agent identity. Copy its `agentId` from the Agent's API Access panel after publishing.
   </Card>
-  <Card title="Caller token" icon="badge-check">
-    An access token for calling the Mosoo API. The token identifies the caller; it does not change which published Agent is run or how that Agent is configured.
+  <Card title="API token" icon="badge-check">
+    A token for calling the Mosoo API. It identifies the caller; it does not change which published Agent is run or how that Agent is configured.
   </Card>
   <Card title="Thread" icon="message-circle">
     The conversation container created through the API. Threads track messages, files, run status, attribution, and lifecycle state.
@@ -70,25 +81,6 @@ The response includes a `thread.id` and the first `run`. Use that Thread ID for 
     The stable public log for API consumers. Send user messages or permission decisions, then read Agent-visible results from the Thread event list.
   </Card>
 </Columns>
-
-## What you can build
-
-Mosoo API lets you connect a published Agent to your own application. Treat the Mosoo-hosted Agent as a callable backend: your system sends input, the Agent works inside its Mosoo runtime and workspace, and your app reads replies, status, and file results.
-
-You can use it to:
-
-- Build a chatbot, mobile app, or web app with a Mosoo Agent behind it.
-- Add a configured Agent to a custom app so it can handle user requests, files, and context.
-- Coordinate multiple Agents with glue code and turn them into a collaborative workspace or automation flow.
-- Trigger an always-online Agent from schedules, external events, or your own service so it can handle work on demand.
-
-## How it works
-
-1. Create and publish an Agent in Mosoo.
-2. Store the API token and Agent ID in your app backend.
-3. Create a Thread through the API and send user input or files to the Agent.
-4. Read Thread replies, progress, status, and file results.
-5. Send new input to the same Thread when the conversation or task needs to continue.
 
 ## API capabilities
 
@@ -109,10 +101,10 @@ You can use it to:
 
 ## Access model
 
-Every request is evaluated against the published Agent and the caller token:
+Every request is evaluated against the published Agent and the API token:
 
 - The Agent must exist, be published, and expose API access.
-- The caller token must be valid and not revoked.
+- The API token must be valid and not revoked.
 - The caller must still pass Organization membership and Agent access checks.
 - Runs use the published Agent owner's configured capabilities.
 
