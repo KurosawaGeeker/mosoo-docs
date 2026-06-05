@@ -1,6 +1,6 @@
 ---
 title: "Mosoo API"
-description: "在你的应用中通过 API 集成并调用发布的 Mosoo Agent。"
+description: "在你的应用中通过 API 集成并调用 Mosoo Agent。"
 ---
 
 export const mosooDevOrigin = "http://localhost:5173";
@@ -12,17 +12,17 @@ export const mosooOrigin =
 export const publishAgentPath = "/agent";
 export const apiTokenPath = "/settings/access-tokens";
 
-你的应用提供 API token 和已发布 Agent 的 `agentId`；Mosoo 会创建 Thread、启动 Agent，并向 API 调用方开放这个 Thread 的公开事件和文件。
+你的应用提供 API token 和 Agent 的 `agentId`；Mosoo 会创建 Thread、启动 Agent，并向 API 调用方开放这个 Thread 的公开事件和文件。
 
 这就是 Agent 发布菜单里 **API 接入** 对应的集成能力。
 
 ## 可以用来做什么
 
-Mosoo API 让你把已经发布的 Agent 接入自己的应用。你可以把 Mosoo 托管的 Agent 当成一个可调用的后端：你的系统发送输入，Agent 在 Mosoo 的运行环境中处理任务，然后你再读取回复、状态和文件结果。
+Mosoo API 让你把 Agent 接入自己的应用。你可以把 Mosoo 托管的 Agent 当成一个可调用的后端：你的系统发送输入，Agent 在 Mosoo 的运行环境中处理任务，然后你再读取回复、状态和文件结果。
 
 <Columns cols={2}>
   <Card title="聊天机器人和应用后端" icon="comments">
-    为聊天机器人、移动 App 或网页应用接入 Mosoo Agent，让你的后端调用已发布 Agent。
+    为聊天机器人、移动 App 或网页应用接入 Mosoo Agent，让你的后端调用 Agent。
   </Card>
 
   <Card title="定制应用能力" icon="sliders">
@@ -89,7 +89,7 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
 
 <Columns cols={2}>
   <Card title="Agent" icon="user-astronaut">
-    已经发布的Agent，可以通过 API 调用在 Agents 面板和Agent 详情页获取它的`agentId`。
+    你在 Mosoo 中配置的智能体，可以在 Agents 面板和 Agent 详情页获取它的`agentId`。
   </Card>
 
   <Card title="API token" icon="key">
@@ -107,12 +107,11 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
 
 ## 访问模型
 
-每个请求都会同时校验已发布 Agent 和 API token：
+每个请求都会同时校验 Agent 和 API token：
 
-- Agent 必须存在、已发布，并启用 API 接入。
+- Agent 必须存在，并启用 API 接入。
 - API token 必须有效且未被撤销。
 - 调用方仍需具备访问此 Agent 的权限。
-- ~~运行时会使用已发布 Agent 所有者配置的能力边界。~~
 
 <Card title="理解 token 和访问控制" icon="shield-check" horizontal href="/zh-Hans/auth-and-access">
   了解 API token、Agent 访问路径、归因和所有者配置如何配合。
