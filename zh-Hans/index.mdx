@@ -11,7 +11,6 @@ export const mosooOrigin =
     : mosooProdOrigin;
 export const publishAgentPath = "/agent";
 export const apiTokenPath = "/settings/access-tokens";
-export const createThreadPath = "/api/v1/agents/{agentId}/threads";
 
 # 基于Mosoo Agent 集成开发
 
@@ -43,7 +42,7 @@ Mosoo API 让你把已经发布的 Agent 接入自己的应用。你可以把 Mo
     在用户头像- settings - API tokens 创建标识你身份的 `API token`
   </Card>
 
-  <Card title="创建 Thread" icon="3" href={`${mosooOrigin}${createThreadPath}`}>
+  <Card title="创建 Thread" icon="3" href="/api-reference/create-a-thread-for-a-published-agent">
     携带 `API token `\+`agentId` 通过API 创建 Thread，发送事件、文件并读取结果。
   </Card>
 </Columns>
