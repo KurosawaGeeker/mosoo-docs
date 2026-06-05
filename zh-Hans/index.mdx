@@ -1,13 +1,13 @@
 ---
 title: "Mosoo API"
-description: "在你的应用中通过 API 集成并调用已发布的 Mosoo Agent。"
+description: "在你的应用中通过 API 集成并调用发布的 Mosoo Agent。"
 ---
 
-# 基于已发布 Mosoo Agent 开发
+# 基于Mosoo Agent 集成开发
 
-Mosoo API 用于在你的应用中调用**已发布**的 Mosoo Agent。你的应用提供 API token 和已发布 Agent 的 `agentId`；Mosoo 会创建 Thread、启动 Agent，并向 API 调用方开放这个 Thread 的公开事件和文件。
+你的应用提供 API token 和已发布 Agent 的 `agentId`；Mosoo 会创建 Thread、启动 Agent，并向 API 调用方开放这个 Thread 的公开事件和文件。
 
-这就是 Agent 发布菜单里 **API 接入（API Access）** 入口对应的集成能力。
+这就是 Agent 发布菜单里 **API 接入** 对应的集成能力。
 
 <Note>
   API 只适用于已发布的 Agent。Agent 配置、模型服务商连接和渠道绑定都需要先在 Mosoo 中完成。
@@ -23,7 +23,7 @@ Mosoo API 用于在你的应用中调用**已发布**的 Mosoo Agent。你的应
   </Card>
 
   <Card title="创建 Thread" icon="3">
-    携带 `API token `\+`agentId` 通过API 创建 Thread，然后发送事件、文件并读取结果。
+    携带 `API token `\+`agentId` 通过API 创建 Thread，发送事件、文件并读取结果。
   </Card>
 </Columns>
 
@@ -60,7 +60,7 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
 
 <Columns cols={2}>
   <Card title="Agent" icon="user-astronaut">
-    可以通过 API 调用的 Agent。~~在 Agent 发布后的 API 接入面板中获取它的~~ `agentId`~~。~~
+    已经发布的Agent，可以通过 API 调用在 Agents 面板和Agent 详情页获取它的`agentId`。
   </Card>
 
   <Card title="API token" icon="key">
@@ -96,11 +96,11 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
     `POST /threads/{threadId}/events` 发送用户消息、权限决策或中断。`GET /threads/{threadId}/events` 读取公开事件日志。
   </Card>
 
-  <Card title="附加文件" icon="paperclip" href="/api-reference/add-a-thread-file">
+  <Card title="文件管理" icon="paperclip" href="/api-reference/add-a-thread-file">
     添加、列出和移除 Thread 文件。API 添加的文件是附件；Agent 生成的文件会作为产物文件返回。
   </Card>
 
-  <Card title="管理生命周期" icon="archive" href="/api-reference/archive-a-thread">
+  <Card title="管理 Thread 生命周期" icon="archive" href="/api-reference/archive-a-thread">
     当集成不再需要 Thread 保持活跃时，可以读取、归档、恢复或删除 Thread。
   </Card>
 </Columns>
@@ -111,8 +111,8 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
 
 - Agent 必须存在、已发布，并启用 API 接入。
 - API token 必须有效且未被撤销。
-- 调用方仍需通过组织成员和 Agent 访问检查。
-- 运行时会使用已发布 Agent 所有者配置的能力边界。
+- 调用方仍需具备访问此 Agent 的权限。
+- ~~运行时会使用已发布 Agent 所有者配置的能力边界。~~
 
 <Card title="理解 token 和访问控制" icon="shield-check" horizontal href="/zh-Hans/auth-and-access">
   了解 API token、Agent 访问路径、归因和所有者配置如何配合。
