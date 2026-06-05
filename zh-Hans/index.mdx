@@ -18,9 +18,8 @@ Mosoo API 用于在你的应用中调用**已发布**的 Mosoo Agent。你的应
     在 Mosoo 中配置 Agent，连接模型服务商，并发布它以获得 `agentId`。
   </Card>
 
-  <Card title="创建调用方 token" icon="key-round">
-    个人调用时使用 Human PAT；\
-    团队服务端任务可使用 Organization Service token。
+  <Card title="创建 API token" icon="key-round">
+    创建个人 access token，让你的应用后端可以调用已发布 Agent。
   </Card>
 
   <Card title="创建 Thread" icon="messages-square">
@@ -65,7 +64,7 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
   </Card>
 
   <Card title="调用方 token" icon="key">
-    Human PAT 或 Organization Service token。token 标识调用方身份。
+    用于调用 Mosoo API 的 access token。token 标识调用方身份。
   </Card>
 
   <Card title="Thread" icon="microblog">
@@ -79,13 +78,22 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
 
 ## 可以用来做什么
 
-当你希望把已发布的 Agent 接入自己的产品或工作流时：
+Mosoo API 让你把已经发布的 Agent 接入自己的应用。你可以把 Mosoo 托管的 Agent 当成一个可调用的后端：你的系统发送输入，Agent 在 Mosoo 的运行环境和工作空间中处理任务，然后你的应用读取回复、状态和文件结果。
 
-- 当工单、订单、告警或任务出现时，从你的后端启动 Agent。
-- 在 Service token 被允许时，通过 `attributed_user_id` 把工作归因到某个用户。
-- 在运行前或运行过程中给 Thread 附加文件。
-- 轮询公开事件日志，读取 Agent 消息、工具状态、文件变化、用量更新和运行完成状态。
-- 使用 `client_external_ref` 和 `Idempotency-Key` 让外部系统与 Mosoo 保持一致。
+你可以用它来：
+
+- 做自己的聊天机器人、移动 App 或网页应用，后端调用 Mosoo Agent。
+- 给定制应用接入一个已经配置好的 Agent，让它处理用户请求、文件和上下文。
+- 用代码协调多个 Agent，把它们组合成一个协作工作台或自动化流程。
+- 用定时任务、外部事件或自己的服务触发这个常驻在线的 Agent，让它按需处理某类工作。
+
+## 它怎么工作
+
+1. 先在 Mosoo 中创建并发布 Agent。
+2. 在你的应用后端保存 API token 和 Agent ID。
+3. 通过 API 创建 Thread，把用户输入或文件交给 Agent。
+4. 读取 Thread 的回复、进度、状态和文件结果。
+5. 需要继续对话或继续任务时，向同一个 Thread 发送新的输入。
 
 ## API 能力范围
 
@@ -113,10 +121,9 @@ curl -X POST "https://mosoo.ai/api/v1/agents/$MOSOO_AGENT_ID/threads" \
 
 - Agent 必须存在、已发布，并启用 API 接入。
 - 调用方 token 必须有效且未被撤销。
-- 使用 Human PAT 的调用方仍需通过组织成员和 Agent 访问检查。
-- Organization Service token 必须被显式允许调用指定的已发布 Agent。
+- 调用方仍需通过组织成员和 Agent 访问检查。
 - 运行时会使用已发布 Agent 所有者配置的能力边界。
 
 <Card title="理解 token 和访问控制" icon="shield-check" horizontal href="/zh-Hans/auth-and-access">
-  了解 Human PAT、Organization Service token、Agent 访问路径、归因和所有者配置如何配合。
+  了解 API token、Agent 访问路径、归因和所有者配置如何配合。
 </Card>

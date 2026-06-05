@@ -18,7 +18,7 @@ This is the same integration surface behind the **API Access** entry in the Agen
     Configure the Agent in Mosoo, connect its model provider, and publish it so it receives an `agentId`.
   </Card>
   <Card title="2. Create a token" icon="key-round">
-    Use a Human PAT for user-owned calls or an Organization Service token for server-side jobs.
+    Create a personal access token so your app backend can call the published Agent.
   </Card>
   <Card title="3. Start a Thread" icon="messages-square">
     Create a Thread with an initial message, then send events, attach files, and read results.
@@ -61,7 +61,7 @@ The response includes a `thread.id` and the first `run`. Use that Thread ID for 
     The callable Agent identity. Copy its `agentId` from the Agent's API Access panel after publishing.
   </Card>
   <Card title="Caller token" icon="badge-check">
-    A Human PAT or Organization Service token. The token identifies the caller; it does not change which published Agent is run or how that Agent is configured.
+    An access token for calling the Mosoo API. The token identifies the caller; it does not change which published Agent is run or how that Agent is configured.
   </Card>
   <Card title="Thread" icon="message-circle">
     The conversation container created through the API. Threads track messages, files, run status, attribution, and lifecycle state.
@@ -73,13 +73,22 @@ The response includes a `thread.id` and the first `run`. Use that Thread ID for 
 
 ## What you can build
 
-Use the API when a published Agent should become part of another product or workflow:
+Mosoo API lets you connect a published Agent to your own application. Treat the Mosoo-hosted Agent as a callable backend: your system sends input, the Agent works inside its Mosoo runtime and workspace, and your app reads replies, status, and file results.
 
-- Start an Agent from your own server when a ticket, order, alert, or job appears.
-- Project work to a user through `attributed_user_id` when an Organization Service token is allowed to do so.
-- Attach files to a Thread before or during a run.
-- Poll the public event log for Agent messages, tool status, file changes, usage updates, and run completion.
-- Keep external systems in sync with `client_external_ref` and `Idempotency-Key`.
+You can use it to:
+
+- Build a chatbot, mobile app, or web app with a Mosoo Agent behind it.
+- Add a configured Agent to a custom app so it can handle user requests, files, and context.
+- Coordinate multiple Agents with glue code and turn them into a collaborative workspace or automation flow.
+- Trigger an always-online Agent from schedules, external events, or your own service so it can handle work on demand.
+
+## How it works
+
+1. Create and publish an Agent in Mosoo.
+2. Store the API token and Agent ID in your app backend.
+3. Create a Thread through the API and send user input or files to the Agent.
+4. Read Thread replies, progress, status, and file results.
+5. Send new input to the same Thread when the conversation or task needs to continue.
 
 ## API capabilities
 
@@ -104,10 +113,9 @@ Every request is evaluated against the published Agent and the caller token:
 
 - The Agent must exist, be published, and expose API access.
 - The caller token must be valid and not revoked.
-- Human callers must still pass Organization membership and Agent access checks.
-- Organization Service tokens must be explicitly allowed to call selected published Agents.
+- The caller must still pass Organization membership and Agent access checks.
 - Runs use the published Agent owner's configured capabilities.
 
 <Card title="Understand tokens and access" icon="shield-check" horizontal href="/auth-and-access">
-  Read how Human PATs, Organization Service tokens, Agent access modes, attribution, and owner settings fit together.
+  Read how API tokens, Agent access modes, attribution, and owner settings fit together.
 </Card>
