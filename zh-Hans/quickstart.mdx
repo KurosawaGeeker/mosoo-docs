@@ -16,7 +16,7 @@ description: "用 curl 为已发布的 Mosoo Agent 创建 Thread。"
 - 被允许调用这个 Agent 的 API token。
 
 ```bash
-export MOSOO_API_TOKEN="grt_pat_..."
+export MOSOO_API_TOKEN="mst_..."
 export MOSOO_AGENT_ID="agent_..."
 ```
 
@@ -108,12 +108,15 @@ curl -X POST "https://mosoo.ai/api/v1/threads/$MOSOO_THREAD_ID/files" \
   <Card title="创建 Thread" icon="plus" href="/api-reference/create-a-thread-for-a-published-agent">
     用已发布 Agent 开始一次新的 API 交互。
   </Card>
+
   <Card title="发送事件" icon="send" href="/api-reference/send-user-messages-permission-decisions-or-interrupts-to-a-thread">
     用消息、权限决策或中断继续一个 Thread。
   </Card>
+
   <Card title="列出事件" icon="list" href="/api-reference/list-thread-events">
     读取 Thread 的公开事件日志。
   </Card>
+
   <Card title="添加文件" icon="paperclip" href="/api-reference/add-a-thread-file">
     给 Thread 附加 base64 编码文件。
   </Card>
