@@ -1,6 +1,6 @@
 ---
 title: "Authentication and access"
-description: "How API tokens, published Agent access, attribution, and owner settings work."
+description: "How API tokens, Agent access, and owner settings work together."
 ---
 
 # Authentication and access
@@ -44,29 +44,13 @@ API access is available only after an Agent is configured and published. A valid
 
 Having a token is not enough. If the caller does not pass the Agent access check, Mosoo returns `403 Forbidden`.
 
-## Attribution and execution
+## Caller identity and execution
 
-Mosoo records the API caller for access checks, attribution, audit logs, and Thread visibility.
+Mosoo records the API caller for access checks, audit logs, and Thread visibility.
 
 Runs still use the published Agent owner's configured capabilities. The API caller does not become the Agent owner, change the Agent's model provider, or supply provider credentials in the request.
 
 For API token calls, the caller is the token owner. Threads and files created through the API are visible according to that caller's Agent access.
-
-```json
-{
-  "attributed_user_id": "user_01KQX1BOUNDHUMAN7Z8",
-  "client_external_ref": "support-ticket-182",
-  "input": {
-    "type": "user.message",
-    "content": [
-      {
-        "type": "text",
-        "text": "Triage this customer escalation."
-      }
-    ]
-  }
-}
-```
 
 ## Token lifecycle
 
