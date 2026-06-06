@@ -3,8 +3,6 @@ title: "Quickstart"
 description: "Create a Thread on a published Mosoo Agent with curl."
 ---
 
-# Quickstart
-
 Create a Thread on a published Agent, send one follow-up message, and read the public event log.
 
 ## Before you start
@@ -12,11 +10,11 @@ Create a Thread on a published Agent, send one follow-up message, and read the p
 You need:
 
 - A published Agent in Mosoo.
-- The Agent ID from the Agent's API Access panel.
+- The `agentId` from the Agent's API Access panel.
 - An API token that is allowed to call that Agent.
 
 ```bash
-export MOSOO_API_TOKEN="grt_pat_..."
+export MOSOO_API_TOKEN="mst_..."
 export MOSOO_AGENT_ID="agent_..."
 ```
 
@@ -55,7 +53,7 @@ export MOSOO_THREAD_ID="thread-id-from-response"
 
 ## 2. Send another message
 
-Use the Thread ID to continue the same Agent interaction.
+Use `thread.id` to continue the same Agent interaction.
 
 ```bash
 curl -X POST "https://mosoo.ai/api/v1/threads/$MOSOO_THREAD_ID/events" \
@@ -121,7 +119,7 @@ curl -X POST "https://mosoo.ai/api/v1/threads/$MOSOO_THREAD_ID/files" \
 
 ## Notes
 
-- A token alone does not unlock every Agent.
+- An API token alone does not unlock every Agent.
 - The Agent must be published.
 - The caller must pass Organization membership and Agent access checks.
 - Use `Idempotency-Key` for retry-safe create-thread and send-events calls.

@@ -805,14 +805,14 @@
     "securitySchemes": {
       "publicApiBearer": {
         "bearerFormat": "Mosoo API token",
-        "description": "Use Authorization: Bearer grt_pat_... . API tokens identify an account and do not carry scopes.",
+        "description": "Use Authorization: Bearer mst_... . API tokens identify an account and do not carry scopes.",
         "scheme": "bearer",
         "type": "http"
       }
     }
   },
   "info": {
-    "description": "Public HTTPS API for creating and retrieving Threads on published Mosoo Agents. v1 resource identifiers are bare ULIDs, not prefixed IDs. API tokens identify the account caller. Runtime execution resolves the published Agent owner capabilities while the Thread is attributed to the token owner.",
+    "description": "Public HTTPS API for creating and retrieving Threads on published Mosoo Agents. v1 resource identifiers are bare ULIDs, not prefixed IDs. API tokens identify the account caller. Runtime execution resolves the published Agent owner capabilities while the Thread is associated with the API token owner.",
     "title": "Mosoo Published Agent API",
     "version": "v1"
   },
@@ -823,7 +823,7 @@
         "description": "Returns Threads created by the authenticated API token caller.",
         "parameters": [
           {
-            "description": "Published Agent ID from the Agent's API Access panel. v1 IDs are bare ULIDs.",
+            "description": "The published Agent's agentId from the Agent's API Access panel. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000001",
             "in": "path",
             "name": "agentId",
@@ -897,10 +897,10 @@
         }
       },
       "post": {
-        "description": "Creates a Thread and the backing AgentSession. If input is present, Mosoo also queues the initial Run. If input is omitted, the Thread is immediately visible with IDLE status and no run. API token callers are attributed to the token owner.",
+        "description": "Creates a Thread and the backing AgentSession. If input is present, Mosoo also queues the initial Run. If input is omitted, the Thread is immediately visible with IDLE status and no run. API token calls are associated with the API token owner.",
         "parameters": [
           {
-            "description": "Published Agent ID from the Agent's API Access panel. v1 IDs are bare ULIDs.",
+            "description": "The published Agent's agentId from the Agent's API Access panel. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000001",
             "in": "path",
             "name": "agentId",
@@ -935,7 +935,7 @@
                   }
                 },
                 "humanPatWithFile": {
-                  "summary": "Personal token with an uploaded file",
+                  "summary": "API token with an uploaded file",
                   "value": {
                     "client_external_ref": "linear-ENG-123",
                     "files": [
@@ -955,7 +955,7 @@
                   }
                 },
                 "personalTokenBasic": {
-                  "summary": "Personal token",
+                  "summary": "API token",
                   "value": {
                     "client_external_ref": "demo-thread-001",
                     "input": {
@@ -1040,7 +1040,7 @@
       "delete": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "`threadId` returned by create thread. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1105,7 +1105,7 @@
       "get": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "`threadId` returned by create thread. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1159,7 +1159,7 @@
       "post": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "`threadId` returned by create thread. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1227,7 +1227,7 @@
         "description": "Returns the latest public event log entries for this Thread in chronological order. This is the stable snapshot read surface for CLI and API consumers; it does not expose raw runtime payloads, transcript, or diagnostics.",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "`threadId` returned by create thread. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1291,7 +1291,7 @@
       "post": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "`threadId` returned by create thread. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1388,7 +1388,7 @@
         "description": "Streams public Thread event log entries as Server-Sent Events. Each `thread.event` data payload uses the same ThreadEventLogEntry shape as GET /threads/{threadId}/events. The stream is for long-running consumer UX and does not expose raw runtime payloads, internal diagnostics, or private transcripts.",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "`threadId` returned by create thread. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1455,7 +1455,7 @@
       "get": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "`threadId` returned by create thread. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1526,7 +1526,7 @@
         "description": "Claims a ready draft file handle into this Thread. Upload file bytes through the files data plane first, then pass the resulting fileId here.",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "`threadId` returned by create thread. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1609,7 +1609,7 @@
       "delete": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "`threadId` returned by create thread. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1690,7 +1690,7 @@
       "post": {
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "`threadId` returned by create thread. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",

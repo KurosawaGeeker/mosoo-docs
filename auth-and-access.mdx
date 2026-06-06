@@ -3,23 +3,19 @@ title: "Authentication and access"
 description: "How API tokens, Agent access, and owner settings work together."
 ---
 
-# Authentication and access
+When calling the Mosoo API, pass both an `API token` and an `agentId`. Mosoo uses the `API token` to identify the caller, then checks whether that caller can access the Agent selected by `agentId`.
 
-The Mosoo API separates **who is calling** from **which published Agent is allowed to run**.
-
-Every request uses a bearer token:
+Every request uses a Bearer API token:
 
 ```bash
-Authorization: Bearer grt_pat_...
+Authorization: Bearer mst_...
 ```
 
-The token identifies the caller. The `agentId` identifies the published Agent. Mosoo checks both before it creates or changes a Thread.
+Mosoo creates or changes a Thread only after the API token is valid and the caller passes the Agent access check.
 
 ## API tokens
 
-<Card title="API token" icon="user-round">
-  A long-lived token for calling the Mosoo API. Create it from your account settings and store it in your app backend, local tools, or automation jobs.
-</Card>
+An API token is the credential your code uses to call the Mosoo API. Create it in account settings and store it in your app backend, local tools, or automation jobs.
 
 <Warning>
   API tokens are not channel connection credentials. Slack, Lark, Discord, Telegram, WeChat, and other channel setup stays in Mosoo.
@@ -31,7 +27,7 @@ API access is available only after an Agent is configured and published. A valid
 
 1. The Agent exists.
 2. The Agent is published and has API Access enabled.
-3. The bearer token is valid and not revoked.
+3. The API token is valid and not revoked.
 4. The caller is allowed to use the Agent.
 5. The requested Thread or file is visible to that caller.
 
@@ -42,32 +38,32 @@ API access is available only after an Agent is configured and published. A valid
 | Organization-wide | Active Organization members with a valid API token. |
 | Invited-only | The Agent owner and explicitly invited collaborators with a valid API token. |
 
-Having a token is not enough. If the caller does not pass the Agent access check, Mosoo returns `403 Forbidden`.
+Having an API token is not enough. If the caller does not pass the Agent access check, Mosoo returns `403 Forbidden`.
 
 ## Caller identity and execution
 
 Mosoo records the API caller for access checks, audit logs, and Thread visibility.
 
-Runs still use the published Agent owner's configured capabilities. The API caller does not become the Agent owner, change the Agent's model provider, or supply provider credentials in the request.
+Runs still use the capability boundary configured by the published Agent's owner. The API caller does not become the Agent owner, change the Agent's model provider, or supply provider credentials in the request.
 
-For API token calls, the caller is the token owner. Threads and files created through the API are visible according to that caller's Agent access.
+For API token calls, the caller is the API token owner. Threads and files created through the API are visible according to that caller's Agent access.
 
-## Token lifecycle
+## API token lifecycle
 
-Create and revoke tokens from Mosoo. Revoking a token blocks future API requests from that token; it does not delete existing Threads.
+Create and revoke API tokens in Mosoo. Revoking an API token blocks future API requests from that API token; it does not delete existing Threads.
 
-Use separate tokens for separate systems when possible:
+Use separate API tokens for separate systems when possible:
 
-- one API token for local development,
-- one API token per server-side integration or automation,
-- clear token labels for audit and rotation.
+- Use one API token for local development.
+- Use one API token per server-side integration or automation.
+- Use clear API token labels for audit and rotation.
 
 ## Safe retries
 
-When you need to retry a failed create-thread or send-event request, send the same `Idempotency-Key`.
+When retrying a failed Thread creation or event send request, send the same `Idempotency-Key`.
 
 ```bash
 -H "Idempotency-Key: support-ticket-182-create-thread"
 ```
 
-The same key with the same request returns the original response, so you do not create or send the same thing twice. Reusing it while the first request is still processing, or with a different request, returns a conflict.
+The same key with the same request returns the original response, so you do not create or send the same thing twice. Reusing the key while the first request is still processing, or using it with a different request, returns a conflict.
