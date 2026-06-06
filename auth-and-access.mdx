@@ -62,12 +62,12 @@ Use separate tokens for separate systems when possible:
 - one API token per server-side integration or automation,
 - clear token labels for audit and rotation.
 
-## Idempotency
+## Safe retries
 
-Use `Idempotency-Key` for retry-safe create-thread and send-events calls.
+When you need to retry a failed create-thread or send-event request, send the same `Idempotency-Key`.
 
 ```bash
 -H "Idempotency-Key: support-ticket-182-create-thread"
 ```
 
-Reusing the same key with the same request returns the original response. Reusing it while the first request is still processing, or with a different request, returns a conflict.
+The same key with the same request returns the original response, so you do not create or send the same thing twice. Reusing it while the first request is still processing, or with a different request, returns a conflict.
