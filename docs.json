@@ -32,7 +32,7 @@
               },
               {
                 "group": "API Reference",
-                "openapi": "mosoo-openapi.generated.json"
+                "openapi": "mosoo-openapi.en.generated.json"
               }
             ]
           },
@@ -61,7 +61,7 @@
               },
               {
                 "group": "API Reference",
-                "openapi": "mosoo-openapi.generated.json"
+                "openapi": "mosoo-openapi.zh-Hans.generated.json"
               }
             ]
           },

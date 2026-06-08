@@ -1,0 +1,100 @@
+name: Sync OpenAPI reference
+
+on:
+  workflow_dispatch:
+    inputs:
+      mosoo_ref:
+        description: Mosoo ref, branch, tag, or SHA to generate from
+        required: false
+        default: main
+  repository_dispatch:
+    types: [mosoo-openapi-changed]
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: sync-openapi-reference
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout docs
+        uses: actions/checkout@v6
+        with:
+          path: docs
+
+      - name: Checkout Mosoo source
+        uses: actions/checkout@v6
+        with:
+          repository: langgenius/mosoo
+          ref: ${{ github.event.client_payload.sha || github.event.client_payload.ref || inputs.mosoo_ref || 'main' }}
+          token: ${{ secrets.MOSOO_REPO_TOKEN || github.token }}
+          path: mosoo
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Install Mosoo dependencies
+        run: bun install --frozen-lockfile
+        working-directory: mosoo
+
+      - name: Regenerate localized OpenAPI specs
+        run: npm run openapi:sync
+        working-directory: docs
+        env:
+          MOSOO_REPO_DIR: ${{ github.workspace }}/mosoo
+
+      - name: Commit generated specs
+        id: commit
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "OpenAPI specs are already up to date."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add docs.json mosoo-openapi.generated.json mosoo-openapi.en.generated.json mosoo-openapi.zh-Hans.generated.json scripts package.json README.md
+          git commit -m "docs: sync OpenAPI reference"
+          git push
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+        working-directory: docs
+
+      - name: Trigger Mintlify deployment
+        if: ${{ steps.commit.outputs.changed == 'true' }}
+        run: |
+          if [ -z "${MINTLIFY_PROJECT_ID}" ] || [ -z "${MINTLIFY_API_KEY}" ]; then
+            echo "Mintlify deployment secrets are not configured; skipping."
+            exit 0
+          fi
+
+          curl --fail --request POST \
+            --url "https://api.mintlify.com/v1/project/update/${MINTLIFY_PROJECT_ID}" \
+            --header "Authorization: Bearer ${MINTLIFY_API_KEY}"
+        env:
+          MINTLIFY_API_KEY: ${{ secrets.MINTLIFY_API_KEY }}
+          MINTLIFY_PROJECT_ID: ${{ secrets.MINTLIFY_PROJECT_ID }}
+
+      - name: Trigger Netlify build hook
+        if: ${{ steps.commit.outputs.changed == 'true' }}
+        run: |
+          if [ -z "${NETLIFY_BUILD_HOOK_URL}" ]; then
+            echo "NETLIFY_BUILD_HOOK_URL is not configured; skipping."
+            exit 0
+          fi
+
+          curl --fail --request POST "${NETLIFY_BUILD_HOOK_URL}"
+        env:
+          NETLIFY_BUILD_HOOK_URL: ${{ secrets.NETLIFY_BUILD_HOOK_URL }}

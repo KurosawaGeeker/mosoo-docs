@@ -7,11 +7,14 @@ Documentation source for the Mosoo API docs site.
 
 ## About
 
-This repository contains the Mintlify documentation for calling published Mosoo Agents. The API Reference is generated from the local OpenAPI snapshot:
+This repository contains the Mintlify documentation for calling published Mosoo Agents. The API Reference is generated from localized OpenAPI snapshots:
 
 ```text
-mosoo-openapi.generated.json
+mosoo-openapi.en.generated.json
+mosoo-openapi.zh-Hans.generated.json
 ```
+
+`mosoo-openapi.generated.json` is kept as an English compatibility copy for older links or tooling.
 
 ## Local Development
 
@@ -34,5 +37,41 @@ The preview runs at `http://localhost:3000`.
 - `docs.json` configures the Mintlify site, navigation, theme, and API reference.
 - `*.mdx` contains the English documentation pages.
 - `zh-Hans/` contains the Simplified Chinese documentation pages.
-- `mosoo-openapi.generated.json` is the OpenAPI snapshot used by the API Reference.
+- `mosoo-openapi.en.generated.json` is the English OpenAPI snapshot used by the English API Reference.
+- `mosoo-openapi.zh-Hans.generated.json` is the Simplified Chinese OpenAPI snapshot used by the Chinese API Reference.
+- `mosoo-openapi.generated.json` is a compatibility copy of the English snapshot.
+- `scripts/sync-openapi-specs.mjs` regenerates and validates the localized OpenAPI snapshots from the Mosoo source repo.
+- `scripts/openapi.zh-Hans.translations.json` stores the Simplified Chinese translations keyed by the English source text.
 - `images/` contains brand and documentation assets.
+
+## OpenAPI Sync
+
+Mosoo is the source of truth. Regenerate the docs snapshots from a local Mosoo checkout:
+
+```bash
+MOSOO_REPO_DIR=/path/to/mosoo npm run openapi:sync
+```
+
+Check whether generated snapshots are stale:
+
+```bash
+MOSOO_REPO_DIR=/path/to/mosoo npm run openapi:check
+```
+
+The sync script:
+
+- imports Mosoo's `createPublishedAgentOpenApiDocument` from the source repo;
+- normalizes public-facing token wording to `API token`;
+- generates English and Simplified Chinese OpenAPI snapshots;
+- fails if any visible `title`, `summary`, `description`, or `bearerFormat` string lacks a Chinese translation;
+- verifies the Chinese snapshot has the same non-text structure as the English snapshot.
+
+The docs workflow `.github/workflows/sync-openapi.yml` can run manually, nightly, or from a Mosoo `repository_dispatch` event named `mosoo-openapi-changed`. When generated snapshots change, it commits them back to this repo so the configured docs host can redeploy.
+
+Secrets used by the sync workflow:
+
+- `MOSOO_REPO_TOKEN`: optional token for checking out a private Mosoo source repo.
+- `MINTLIFY_API_KEY` and `MINTLIFY_PROJECT_ID`: optional; triggers Mintlify's deployment API after a generated commit.
+- `NETLIFY_BUILD_HOOK_URL`: optional; triggers a Netlify build hook after a generated commit.
+
+The Mosoo source repo should include `.github/workflows/docs-openapi-dispatch.yml` and configure `MOSOO_DOCS_DISPATCH_TOKEN` with permission to dispatch workflows in `KurosawaGeeker/mosoo-docs`. That workflow listens to OpenAPI source paths and sends the current Mosoo SHA to this repo.

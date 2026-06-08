@@ -9,7 +9,7 @@
             }
           }
         },
-        "description": "The Agent/session state rejects this action, or an Idempotency-Key is already processing or was reused for a different request."
+        "description": "当前 Agent/session 状态拒绝此操作，或 Idempotency-Key 正在处理，或被用于不同的请求。"
       },
       "Forbidden": {
         "content": {
@@ -19,7 +19,7 @@
             }
           }
         },
-        "description": "The caller cannot consume this Agent."
+        "description": "调用方不能使用这个 Agent。"
       },
       "InternalError": {
         "content": {
@@ -29,7 +29,7 @@
             }
           }
         },
-        "description": "The request failed unexpectedly."
+        "description": "请求发生意外失败。"
       },
       "InvalidRequest": {
         "content": {
@@ -39,7 +39,7 @@
             }
           }
         },
-        "description": "The request shape or query value is invalid."
+        "description": "请求结构或查询参数值无效。"
       },
       "NotFound": {
         "content": {
@@ -49,7 +49,7 @@
             }
           }
         },
-        "description": "The resource was not found for this caller."
+        "description": "没有找到该调用方可访问的资源。"
       },
       "RateLimited": {
         "content": {
@@ -59,10 +59,10 @@
             }
           }
         },
-        "description": "The API token exceeded the public API request budget for the current window.",
+        "description": "该 API token 已超过当前时间窗口内的公开 API 请求额度。",
         "headers": {
           "Retry-After": {
-            "description": "Seconds to wait before retrying the request.",
+            "description": "重试请求前需要等待的秒数。",
             "schema": {
               "minimum": 1,
               "type": "integer"
@@ -78,19 +78,19 @@
             }
           }
         },
-        "description": "A valid API token is required."
+        "description": "需要提供有效的 API token。"
       }
     },
     "schemas": {
       "ThreadEventInput": {
-        "description": "A single event posted to a Thread. Exactly one variant applies: send a user message, answer a pending permission request, or interrupt a running Run.",
+        "description": "提交到 Thread 的单个事件。只能选择一种事件类型：发送用户消息、回答待处理的权限请求，或中断正在运行的 Run。",
         "oneOf": [
           {
             "additionalProperties": false,
-            "description": "Send a new user message into the Thread, optionally with file attachments.",
+            "description": "向 Thread 发送新的用户消息，可选择附带文件附件。",
             "properties": {
               "attachmentIds": {
-                "description": "File IDs (bare ULIDs) to attach to this message. Each file must already be uploaded and claimed into this Thread.",
+                "description": "要附加到此消息的文件 ID（不带前缀的 ULID）。每个文件都必须已经上传，并已声明到这个 Thread 中。",
                 "items": {
                   "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
                   "format": "ulid",
@@ -100,20 +100,20 @@
                 "type": "array"
               },
               "clientRequestId": {
-                "description": "Optional caller-supplied correlation ID echoed back on the matching event result so you can pair responses with the message you sent.",
+                "description": "调用方可选提供的关联 ID。它会在匹配的事件结果中原样返回，便于你把响应与发送的消息对应起来。",
                 "type": [
                   "string",
                   "null"
                 ]
               },
               "text": {
-                "description": "The user message text. Must not be empty.",
+                "description": "用户消息文本。不能为空。",
                 "minLength": 1,
                 "type": "string"
               },
               "type": {
                 "const": "user_message",
-                "description": "Discriminator selecting the send-user-message variant."
+                "description": "用于选择发送用户消息事件类型的判别字段。"
               }
             },
             "required": [
@@ -124,23 +124,23 @@
           },
           {
             "additionalProperties": false,
-            "description": "Answer a permission request the Agent raised while waiting for input (for example a tool confirmation).",
+            "description": "回答 Agent 在等待输入时发起的权限请求，例如工具确认请求。",
             "properties": {
               "decision": {
-                "description": "Whether to allow or reject the requested action for this single occurrence. `allow_once` permits it now; `reject_once` denies it now.",
+                "description": "是否允许或拒绝本次请求的操作。`allow_once` 表示本次允许；`reject_once` 表示本次拒绝。",
                 "enum": [
                   "allow_once",
                   "reject_once"
                 ]
               },
               "requestId": {
-                "description": "ID of the permission request being answered, taken from the corresponding `tool.confirmation.required` event.",
+                "description": "正在回答的权限请求 ID，来自对应的 `tool.confirmation.required` 事件。",
                 "minLength": 1,
                 "type": "string"
               },
               "type": {
                 "const": "permission_decision",
-                "description": "Discriminator selecting the permission-decision variant."
+                "description": "用于选择权限决策事件类型的判别字段。"
               }
             },
             "required": [
@@ -152,10 +152,10 @@
           },
           {
             "additionalProperties": false,
-            "description": "Interrupt a Run that is currently executing on the Thread.",
+            "description": "中断当前正在这个 Thread 上执行的 Run。",
             "properties": {
               "runId": {
-                "description": "Run ID (bare ULID) to interrupt. Omit or send null to interrupt the Thread's current Run.",
+                "description": "要中断的 Run ID（不带前缀的 ULID）。省略或传入 null 时，会中断该 Thread 当前的 Run。",
                 "oneOf": [
                   {
                     "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
@@ -170,7 +170,7 @@
               },
               "type": {
                 "const": "user_interrupt",
-                "description": "Discriminator selecting the interrupt variant."
+                "description": "用于选择中断事件类型的判别字段。"
               }
             },
             "required": [
@@ -182,10 +182,10 @@
       },
       "SendEventsRequest": {
         "additionalProperties": false,
-        "description": "Request body for posting a batch of events to a Thread.",
+        "description": "向 Thread 批量提交事件的请求体。",
         "properties": {
           "events": {
-            "description": "Ordered list of events to apply to the Thread. At least one is required.",
+            "description": "要应用到 Thread 的有序事件列表。至少需要一个事件。",
             "items": {
               "$ref": "#/components/schemas/ThreadEventInput"
             },
@@ -200,7 +200,7 @@
       },
       "CreateThreadFileRequest": {
         "additionalProperties": false,
-        "description": "Request body for claiming a previously uploaded draft file handle into a Thread.",
+        "description": "把之前上传的草稿文件句柄声明到 Thread 中的请求体。",
         "properties": {
           "fileId": {
             "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
@@ -209,7 +209,7 @@
             "type": "string",
             "maxLength": 26,
             "minLength": 1,
-            "description": "ID of a ready draft file (bare ULID) previously uploaded through the files data plane by the same API token caller."
+            "description": "同一个 API token 调用方之前通过文件数据平面上传、且已准备好的草稿文件 ID（不带前缀的 ULID）。"
           }
         },
         "required": [
@@ -218,13 +218,13 @@
         "type": "object"
       },
       "ErrorResponse": {
-        "description": "Standard error envelope returned for any non-2xx public API response.",
+        "description": "所有非 2xx 公开 API 响应返回的标准错误包裹结构。",
         "properties": {
           "error": {
-            "description": "Details about why the request failed.",
+            "description": "请求失败原因的详细信息。",
             "properties": {
               "code": {
-                "description": "Stable, machine-readable error code you can branch on.",
+                "description": "稳定的、机器可读的错误码，可用于分支处理。",
                 "enum": [
                   "agent_not_published",
                   "forbidden",
@@ -240,7 +240,7 @@
                 ]
               },
               "message": {
-                "description": "Human-readable explanation of the error. Not intended for end users.",
+                "description": "面向开发者的错误说明，不用于直接展示给最终用户。",
                 "type": "string"
               }
             },
@@ -258,15 +258,15 @@
       },
       "SendEventsResponse": {
         "additionalProperties": false,
-        "description": "Result of accepting a batch of events posted to a Thread.",
+        "description": "接受提交到 Thread 的一批事件后的结果。",
         "properties": {
           "acceptedAt": {
-            "description": "Timestamp (RFC 3339) at which the event batch was accepted for processing.",
+            "description": "这批事件被接受处理的时间戳（RFC 3339）。",
             "format": "date-time",
             "type": "string"
           },
           "events": {
-            "description": "Per-event outcomes, in the same order as the submitted events.",
+            "description": "每个事件对应的处理结果，顺序与提交的事件一致。",
             "items": {
               "$ref": "#/components/schemas/ThreadEventResult"
             },
@@ -274,10 +274,10 @@
           },
           "thread": {
             "$ref": "#/components/schemas/ThreadSummary",
-            "description": "The Thread state after applying the batch."
+            "description": "应用这批事件后的 Thread 状态。"
           },
           "warnings": {
-            "description": "Non-fatal warnings raised while accepting the batch (for example a partially honored request). Empty when there are none.",
+            "description": "接受这批事件时产生的非致命警告，例如请求只被部分接受。没有警告时为空。",
             "items": {
               "$ref": "#/components/schemas/UserWarning"
             },
@@ -294,14 +294,14 @@
       },
       "ThreadEventLogEntry": {
         "additionalProperties": false,
-        "description": "A single public event log entry for a Thread. This is the stable read surface and never exposes raw runtime payloads, transcripts, or diagnostics.",
+        "description": "Thread 的单条公开事件日志。这是稳定的读取接口，不会暴露原始运行时 payload、转写内容或诊断信息。",
         "properties": {
           "content": {
-            "description": "Public content of the event — typically a reference to the associated payload (such as a message ID) rather than the raw runtime data.",
+            "description": "事件的公开内容，通常是相关 payload 的引用（例如消息 ID），而不是原始运行时数据。",
             "type": "string"
           },
           "durationMs": {
-            "description": "Wall-clock duration of the event in milliseconds, when applicable (for example a completed Run). Null when not measured.",
+            "description": "事件的实际耗时，单位为毫秒；仅在适用时返回，例如已完成的 Run。未测量时为 null。",
             "type": [
               "integer",
               "null"
@@ -312,15 +312,15 @@
             "format": "ulid",
             "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string",
-            "description": "Unique event ID (bare ULID), monotonically increasing in chronological order."
+            "description": "唯一事件 ID（不带前缀的 ULID），按时间顺序单调递增。"
           },
           "occurredAt": {
-            "description": "Timestamp (RFC 3339) at which the event occurred.",
+            "description": "事件发生的时间戳（RFC 3339）。",
             "format": "date-time",
             "type": "string"
           },
           "status": {
-            "description": "Delivery status of the event: `available` when the event is fully populated, `error` when it failed, `unsupported` when this event type cannot be rendered on the public surface.",
+            "description": "事件交付状态：`available` 表示事件内容完整；`error` 表示事件失败；`unsupported` 表示该事件类型不能在公开接口上渲染。",
             "enum": [
               "available",
               "error",
@@ -328,14 +328,14 @@
             ]
           },
           "tokens": {
-            "description": "Token count associated with the event when applicable (for example model usage). Null when not measured.",
+            "description": "与事件相关的 token 数量；仅在适用时返回，例如模型用量。未测量时为 null。",
             "type": [
               "integer",
               "null"
             ]
           },
           "type": {
-            "description": "Event type, such as `run.started`, `run.completed`, `agent.message.delta`, or `tool.use.started`.",
+            "description": "事件类型，例如 `run.started`、`run.completed`、`agent.message.delta` 或 `tool.use.started`。",
             "enum": [
               "agent.message.delta",
               "agent.thinking.delta",
@@ -366,17 +366,17 @@
       },
       "ThreadEventListResponse": {
         "additionalProperties": false,
-        "description": "A page of the latest Thread event log entries in chronological order.",
+        "description": "按时间顺序返回的一页最新 Thread 事件日志。",
         "properties": {
           "events": {
-            "description": "The returned event log entries, oldest first within the requested window.",
+            "description": "返回的事件日志条目。在请求窗口内，最早的事件排在最前。",
             "items": {
               "$ref": "#/components/schemas/ThreadEventLogEntry"
             },
             "type": "array"
           },
           "truncated": {
-            "description": "True when older events exist beyond the returned window because the requested limit was reached.",
+            "description": "如果因为达到请求上限而没有返回更早的事件，则为 true。",
             "type": "boolean"
           }
         },
@@ -388,17 +388,17 @@
       },
       "ThreadEventResult": {
         "additionalProperties": false,
-        "description": "Outcome of a single submitted event.",
+        "description": "单个已提交事件的处理结果。",
         "properties": {
           "clientRequestId": {
-            "description": "The `clientRequestId` echoed from the submitted user message, or null when none was provided or the event type does not carry one.",
+            "description": "从提交的用户消息中回传的 `clientRequestId`。如果没有提供，或该事件类型不携带此字段，则为 null。",
             "type": [
               "string",
               "null"
             ]
           },
           "run": {
-            "description": "The Run created or affected by this event, or null when the event did not start or change a Run.",
+            "description": "此事件创建或影响的 Run。如果该事件没有启动或改变 Run，则为 null。",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/RunSummary"
@@ -409,7 +409,7 @@
             ]
           },
           "type": {
-            "description": "The kind of event this result corresponds to.",
+            "description": "此结果对应的事件类型。",
             "enum": [
               "permission_decision",
               "user_interrupt",
@@ -426,18 +426,18 @@
       },
       "CreateThreadRequest": {
         "additionalProperties": false,
-        "description": "Request body for creating a Thread. All fields are optional: omit `input` to create an empty IDLE Thread, or include it to queue the initial Run.",
+        "description": "创建 Thread 的请求体。所有字段都是可选的：省略 `input` 会创建一个空的 IDLE Thread；提供 `input` 会排队启动初始 Run。",
         "properties": {
           "client_external_ref": {
-            "description": "Optional caller-owned reference (for example an external ticket key) stored on the Thread for correlation. Not unique and not validated by Mosoo.",
+            "description": "调用方自定义的可选引用，例如外部工单 key。该值会存储在 Thread 上用于关联；不要求唯一，也不会由 Mosoo 校验。",
             "maxLength": 255,
             "type": "string"
           },
           "files": {
-            "description": "Draft file handles uploaded by the same API token caller.",
+            "description": "同一个 API token 调用方上传的草稿文件句柄。",
             "items": {
               "additionalProperties": false,
-              "description": "Reference to a single uploaded draft file to attach to the Thread.",
+              "description": "要附加到 Thread 的单个已上传草稿文件引用。",
               "properties": {
                 "file_id": {
                   "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
@@ -446,7 +446,7 @@
                   "type": "string",
                   "maxLength": 26,
                   "minLength": 1,
-                  "description": "ID (bare ULID) of a ready draft file uploaded by the same caller."
+                  "description": "同一调用方上传、且已准备好的草稿文件 ID（不带前缀的 ULID）。"
                 }
               },
               "required": [
@@ -458,23 +458,23 @@
           },
           "input": {
             "additionalProperties": false,
-            "description": "Initial user message that seeds the Thread and queues the first Run. Omit to create an empty Thread with no run.",
+            "description": "用于初始化 Thread 并排队启动第一个 Run 的用户消息。省略时会创建一个没有 Run 的空 Thread。",
             "properties": {
               "content": {
-                "description": "Ordered content parts that make up the initial message.",
+                "description": "组成初始消息的有序内容片段。",
                 "items": {
                   "additionalProperties": false,
-                  "description": "A single content part of the initial message.",
+                  "description": "初始消息中的单个内容片段。",
                   "properties": {
                     "text": {
-                      "description": "The text of this content part. Must not be empty.",
+                      "description": "该内容片段的文本。不能为空。",
                       "maxLength": 32000,
                       "minLength": 1,
                       "type": "string"
                     },
                     "type": {
                       "const": "text",
-                      "description": "Content part discriminator. Only `text` is supported today."
+                      "description": "内容片段判别字段。目前仅支持 `text`。"
                     }
                   },
                   "required": [
@@ -488,7 +488,7 @@
               },
               "type": {
                 "const": "user.message",
-                "description": "Discriminator for the initial input. Always `user.message`."
+                "description": "初始输入的判别字段。固定为 `user.message`。"
               }
             },
             "required": [
@@ -503,14 +503,14 @@
       },
       "CreateThreadResponse": {
         "additionalProperties": false,
-        "description": "Result of creating a Thread.",
+        "description": "创建 Thread 的结果。",
         "properties": {
           "links": {
             "$ref": "#/components/schemas/ThreadLinks",
-            "description": "Convenience links for the created Thread."
+            "description": "已创建 Thread 的便捷链接。"
           },
           "run": {
-            "description": "The initial Run queued when `input` was provided, or null when an empty Thread was created.",
+            "description": "提供 `input` 时排队启动的初始 Run；创建空 Thread 时为 null。",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/RunSummary"
@@ -522,7 +522,7 @@
           },
           "thread": {
             "$ref": "#/components/schemas/ThreadSummary",
-            "description": "The created Thread."
+            "description": "已创建的 Thread。"
           }
         },
         "required": [
@@ -534,14 +534,14 @@
       },
       "RetrieveThreadResponse": {
         "additionalProperties": false,
-        "description": "Current state of a Thread.",
+        "description": "Thread 的当前状态。",
         "properties": {
           "links": {
             "$ref": "#/components/schemas/ThreadLinks",
-            "description": "Convenience links for the Thread."
+            "description": "Thread 的便捷链接。"
           },
           "run": {
-            "description": "The Thread's most recent Run, or null when no Run has been created yet.",
+            "description": "该 Thread 最近一次 Run；如果尚未创建 Run，则为 null。",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/RunSummary"
@@ -553,7 +553,7 @@
           },
           "thread": {
             "$ref": "#/components/schemas/ThreadSummary",
-            "description": "The Thread summary."
+            "description": "Thread 摘要。"
           }
         },
         "required": [
@@ -565,14 +565,14 @@
       },
       "ThreadFile": {
         "additionalProperties": false,
-        "description": "A file associated with a Thread.",
+        "description": "与 Thread 关联的文件。",
         "properties": {
           "committed": {
-            "description": "True once the file is durably attached to the Thread; false while it is still a draft handle.",
+            "description": "文件持久附加到 Thread 后为 true；仍是草稿句柄时为 false。",
             "type": "boolean"
           },
           "createdAt": {
-            "description": "Timestamp (RFC 3339) at which the file was created.",
+            "description": "文件创建时间戳（RFC 3339）。",
             "format": "date-time",
             "type": "string"
           },
@@ -581,28 +581,28 @@
             "format": "ulid",
             "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string",
-            "description": "Unique file ID (bare ULID)."
+            "description": "唯一文件 ID（不带前缀的 ULID）。"
           },
           "kind": {
-            "description": "Files added through the public API are attachments; artifacts are files produced by the Agent.",
+            "description": "通过公开 API 添加的文件是附件；artifact 是 Agent 生成的文件。",
             "enum": [
               "attachment",
               "artifact"
             ]
           },
           "mimeType": {
-            "description": "Detected MIME type of the file, or null when unknown.",
+            "description": "检测到的文件 MIME type；未知时为 null。",
             "type": [
               "string",
               "null"
             ]
           },
           "name": {
-            "description": "Original file name.",
+            "description": "原始文件名。",
             "type": "string"
           },
           "size": {
-            "description": "File size in bytes.",
+            "description": "文件大小，单位为字节。",
             "minimum": 0,
             "type": "integer"
           }
@@ -620,10 +620,10 @@
       },
       "ThreadFileListResponse": {
         "additionalProperties": false,
-        "description": "List of files attached to a Thread.",
+        "description": "附加到 Thread 的文件列表。",
         "properties": {
           "files": {
-            "description": "The Thread's files.",
+            "description": "该 Thread 的文件。",
             "items": {
               "$ref": "#/components/schemas/ThreadFile"
             },
@@ -637,11 +637,11 @@
       },
       "ThreadFileResponse": {
         "additionalProperties": false,
-        "description": "A single Thread file.",
+        "description": "单个 Thread 文件。",
         "properties": {
           "file": {
             "$ref": "#/components/schemas/ThreadFile",
-            "description": "The Thread file."
+            "description": "Thread 文件。"
           }
         },
         "required": [
@@ -651,14 +651,14 @@
       },
       "ThreadAttributedUser": {
         "additionalProperties": false,
-        "description": "The account a Thread is attributed to (the API token owner).",
+        "description": "该 Thread 归属的账号，即 API token 所有者。",
         "properties": {
           "id": {
             "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
             "format": "ulid",
             "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string",
-            "description": "Account ID (bare ULID) the Thread is attributed to."
+            "description": "该 Thread 归属账号的账号 ID（不带前缀的 ULID）。"
           }
         },
         "required": [
@@ -668,17 +668,17 @@
       },
       "ThreadCaller": {
         "additionalProperties": false,
-        "description": "The credential that created the Thread.",
+        "description": "创建该 Thread 的凭证。",
         "properties": {
           "id": {
             "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
             "format": "ulid",
             "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string",
-            "description": "ID (bare ULID) of the caller that created the Thread."
+            "description": "创建该 Thread 的调用方 ID（不带前缀的 ULID）。"
           },
           "kind": {
-            "description": "Caller credential type. `access_token` identifies an API token caller.",
+            "description": "调用方凭证类型。`access_token` 表示 API token 调用方。",
             "enum": [
               "access_token"
             ]
@@ -692,10 +692,10 @@
       },
       "ThreadLinks": {
         "additionalProperties": false,
-        "description": "Convenience links for a Thread.",
+        "description": "Thread 的便捷链接。",
         "properties": {
           "thread": {
-            "description": "Absolute API URL of the Thread resource.",
+            "description": "Thread 资源的绝对 API URL。",
             "type": "string"
           }
         },
@@ -706,17 +706,17 @@
       },
       "ThreadSummary": {
         "additionalProperties": false,
-        "description": "Summary of a Thread on a published Agent.",
+        "description": "已发布 Agent 上的 Thread 摘要。",
         "properties": {
           "agent_id": {
             "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
             "format": "ulid",
             "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string",
-            "description": "ID (bare ULID) of the published Agent this Thread belongs to."
+            "description": "此 Thread 所属已发布 Agent 的 ID（不带前缀的 ULID）。"
           },
           "attributed_user": {
-            "description": "The account the Thread is attributed to, or null when not attributed to an account.",
+            "description": "该 Thread 归属的账号；未归属到账号时为 null。",
             "oneOf": [
               {
                 "$ref": "#/components/schemas/ThreadAttributedUser"
@@ -727,37 +727,37 @@
             ]
           },
           "client_external_ref": {
-            "description": "The caller-owned reference supplied at creation, or null when none was provided.",
+            "description": "创建时由调用方提供的自定义引用；未提供时为 null。",
             "type": [
               "string",
               "null"
             ]
           },
           "created_at": {
-            "description": "Timestamp (RFC 3339) at which the Thread was created.",
+            "description": "Thread 创建时间戳（RFC 3339）。",
             "format": "date-time",
             "type": "string"
           },
           "created_by": {
             "$ref": "#/components/schemas/ThreadCaller",
-            "description": "The credential that created the Thread."
+            "description": "创建该 Thread 的凭证。"
           },
           "id": {
             "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
             "format": "ulid",
             "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string",
-            "description": "Unique Thread ID (bare ULID)."
+            "description": "唯一 Thread ID（不带前缀的 ULID）。"
           },
           "kind": {
-            "description": "Agent kind backing this Thread (for example a persistent or one-off published Agent).",
+            "description": "支撑此 Thread 的 Agent 类型，例如持久型或一次性已发布 Agent。",
             "enum": [
               "pet",
               "cattle"
             ]
           },
           "last_run_id": {
-            "description": "ID (bare ULID) of the most recent Run, or null when no Run exists yet.",
+            "description": "最近一次 Run 的 ID（不带前缀的 ULID）；尚无 Run 时为 null。",
             "oneOf": [
               {
                 "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
@@ -772,10 +772,10 @@
           },
           "source": {
             "const": "api",
-            "description": "Origin of the Thread. Always `api` for Threads created via this API."
+            "description": "Thread 来源。通过此 API 创建的 Thread 固定为 `api`。"
           },
           "status": {
-            "description": "Lifecycle status of the Thread: `IDLE` (no active run), `RUNNING` (a Run is executing), `RESCHEDULING` (between runs), or `TERMINATED` (ended).",
+            "description": "Thread 生命周期状态：`IDLE` 表示没有活动 Run；`RUNNING` 表示 Run 正在执行；`RESCHEDULING` 表示处于两次 Run 之间；`TERMINATED` 表示已结束。",
             "enum": [
               "IDLE",
               "RUNNING",
@@ -784,14 +784,14 @@
             ]
           },
           "title": {
-            "description": "Human-readable Thread title, or null when one has not been derived yet.",
+            "description": "便于阅读的 Thread 标题；尚未生成时为 null。",
             "type": [
               "string",
               "null"
             ]
           },
           "updated_at": {
-            "description": "Timestamp (RFC 3339) of the most recent change to the Thread.",
+            "description": "Thread 最近一次变更的时间戳（RFC 3339）。",
             "format": "date-time",
             "type": "string"
           }
@@ -814,10 +814,10 @@
       },
       "RunSummary": {
         "additionalProperties": false,
-        "description": "Summary of a single Agent Run on a Thread.",
+        "description": "Thread 上单个 Agent Run 的摘要。",
         "properties": {
           "completedAt": {
-            "description": "Timestamp (RFC 3339) at which the Run reached a terminal state, or null while it has not finished.",
+            "description": "Run 到达终态的时间戳（RFC 3339）；尚未结束时为 null。",
             "format": "date-time",
             "type": [
               "string",
@@ -825,7 +825,7 @@
             ]
           },
           "createdAt": {
-            "description": "Timestamp (RFC 3339) at which the Run was created.",
+            "description": "Run 创建时间戳（RFC 3339）。",
             "format": "date-time",
             "type": "string"
           },
@@ -834,10 +834,10 @@
             "format": "ulid",
             "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string",
-            "description": "Unique Run ID (bare ULID)."
+            "description": "唯一 Run ID（不带前缀的 ULID）。"
           },
           "startedAt": {
-            "description": "Timestamp (RFC 3339) at which the Run began executing, or null while it is still queued.",
+            "description": "Run 开始执行的时间戳（RFC 3339）；仍在排队时为 null。",
             "format": "date-time",
             "type": [
               "string",
@@ -845,7 +845,7 @@
             ]
           },
           "status": {
-            "description": "Current Run status. `queued` and `booting` precede execution; `running` and `waiting_input` are active; `completed`, `failed`, `cancelled`, and `expired` are terminal.",
+            "description": "当前 Run 状态。`queued` 和 `booting` 发生在执行前；`running` 和 `waiting_input` 表示处于活动状态；`completed`、`failed`、`cancelled` 和 `expired` 是终态。",
             "enum": [
               "queued",
               "booting",
@@ -858,7 +858,7 @@
             ]
           },
           "trigger": {
-            "description": "What started the Run: `user_prompt` (a user message), `retry`, `resume`, or `system`.",
+            "description": "触发 Run 的原因：`user_prompt`（用户消息）、`retry`、`resume` 或 `system`。",
             "enum": [
               "user_prompt",
               "retry",
@@ -867,7 +867,7 @@
             ]
           },
           "updatedAt": {
-            "description": "Timestamp (RFC 3339) of the most recent change to the Run.",
+            "description": "Run 最近一次变更的时间戳（RFC 3339）。",
             "format": "date-time",
             "type": "string"
           }
@@ -885,14 +885,14 @@
       },
       "UserWarning": {
         "additionalProperties": false,
-        "description": "A non-fatal warning surfaced to the caller.",
+        "description": "返回给调用方的非致命警告。",
         "properties": {
           "code": {
-            "description": "Stable, machine-readable warning code.",
+            "description": "稳定的、机器可读的警告码。",
             "type": "string"
           },
           "message": {
-            "description": "Human-readable explanation of the warning.",
+            "description": "面向开发者的警告说明。",
             "type": "string"
           }
         },
@@ -906,25 +906,25 @@
     "securitySchemes": {
       "publicApiBearer": {
         "bearerFormat": "Mosoo API token",
-        "description": "Use Authorization: Bearer mst_... . API tokens identify an account and do not carry scopes.",
+        "description": "使用 Authorization: Bearer mst_...。API token 用于识别账号，不携带 scope。",
         "scheme": "bearer",
         "type": "http"
       }
     }
   },
   "info": {
-    "description": "Public HTTPS API for creating and retrieving Threads on published Mosoo Agents. v1 resource identifiers are bare ULIDs, not prefixed IDs. API tokens identify the account caller. Runtime execution resolves the published Agent owner's capabilities while the Thread is attributed to the API token owner.",
-    "title": "Mosoo Published Agent API",
+    "description": "用于在已发布 Mosoo Agent 上创建和读取 Thread 的公开 HTTPS API。v1 资源标识符是不带前缀的 ULID。API token 用于识别发起调用的账号。运行时执行会解析已发布 Agent 所有者的能力，同时 Thread 归属于 API token 所有者。",
+    "title": "Mosoo 已发布 Agent API",
     "version": "v1"
   },
   "openapi": "3.1.0",
   "paths": {
     "/agents/{agentId}/threads": {
       "get": {
-        "description": "Returns Threads created by the authenticated API token caller.",
+        "description": "返回由已认证 API token 调用方创建的 Thread。",
         "parameters": [
           {
-            "description": "Published Agent ID from the Agent's API Access panel. v1 IDs are bare ULIDs.",
+            "description": "来自 Agent API Access 面板的已发布 Agent ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000001",
             "in": "path",
             "name": "agentId",
@@ -938,7 +938,7 @@
             }
           },
           {
-            "description": "Filter by archived state: true returns only archived Threads, false only active ones. Omit to return all Threads.",
+            "description": "按归档状态筛选：true 仅返回已归档 Thread，false 仅返回活动 Thread。省略时返回全部 Thread。",
             "in": "query",
             "name": "archived",
             "schema": {
@@ -951,7 +951,7 @@
             "publicApiBearer": []
           }
         ],
-        "summary": "List Threads for a published Agent",
+        "summary": "列出已发布 Agent 的 Thread",
         "responses": {
           "200": {
             "content": {
@@ -973,7 +973,7 @@
                 }
               }
             },
-            "description": "Thread list."
+            "description": "Thread 列表。"
           },
           "400": {
             "$ref": "#/components/responses/InvalidRequest"
@@ -999,10 +999,10 @@
         }
       },
       "post": {
-        "description": "Creates a Thread and the backing AgentSession. If input is present, Mosoo also queues the initial Run. If input is omitted, the Thread is immediately visible with IDLE status and no run. API token callers are attributed to the API token owner.",
+        "description": "创建 Thread 及其底层 AgentSession。如果提供 input，Mosoo 也会排队启动初始 Run。如果省略 input，Thread 会立即以 IDLE 状态可见，且没有 Run。API token 调用方会归属于 API token 所有者。",
         "parameters": [
           {
-            "description": "Published Agent ID from the Agent's API Access panel. v1 IDs are bare ULIDs.",
+            "description": "来自 Agent API Access 面板的已发布 Agent ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000001",
             "in": "path",
             "name": "agentId",
@@ -1016,7 +1016,7 @@
             }
           },
           {
-            "description": "Optional key for retry-safe create-thread and send-events calls. Reusing the same key with the same request returns the original response. Reusing the key while the original request is still processing returns 409.",
+            "description": "用于安全重试 create-thread 和 send-events 调用的可选键。用同一个键重复提交相同请求会返回原始响应。如果原始请求仍在处理中就重复使用该键，会返回 409。",
             "example": "thread-20260528-linear-eng-123",
             "in": "header",
             "name": "Idempotency-Key",
@@ -1031,13 +1031,13 @@
             "application/json": {
               "examples": {
                 "emptyThread": {
-                  "summary": "Create an empty Thread",
+                  "summary": "创建空 Thread",
                   "value": {
                     "client_external_ref": "draft-empty-thread"
                   }
                 },
                 "accessTokenWithFile": {
-                  "summary": "API token with an uploaded file",
+                  "summary": "带已上传文件的 API token",
                   "value": {
                     "client_external_ref": "linear-ENG-123",
                     "files": [
@@ -1072,7 +1072,7 @@
                   }
                 },
                 "cattleAgentSameShape": {
-                  "summary": "Cattle Agent using the same request shape",
+                  "summary": "使用相同请求结构的 Cattle Agent",
                   "value": {
                     "input": {
                       "content": [
@@ -1093,7 +1093,7 @@
           },
           "required": false
         },
-        "summary": "Create a Thread for a published Agent",
+        "summary": "为已发布 Agent 创建 Thread",
         "responses": {
           "201": {
             "content": {
@@ -1103,10 +1103,10 @@
                 }
               }
             },
-            "description": "Created Thread.",
+            "description": "已创建 Thread。",
             "headers": {
               "Idempotency-Replayed": {
-                "description": "Present as true when this response is replayed from a previous completed request.",
+                "description": "如果此响应是从之前已完成请求中重放的，则该值为 true。",
                 "schema": {
                   "const": "true",
                   "type": "string"
@@ -1140,10 +1140,10 @@
     },
     "/threads/{threadId}": {
       "delete": {
-        "description": "Permanently deletes the Thread and its backing AgentSession.",
+        "description": "永久删除该 Thread 及其底层 AgentSession。",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "create thread 返回的 Thread ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1162,7 +1162,7 @@
             "publicApiBearer": []
           }
         ],
-        "summary": "Delete a Thread",
+        "summary": "删除 Thread",
         "responses": {
           "200": {
             "content": {
@@ -1180,7 +1180,7 @@
                 }
               }
             },
-            "description": "Deleted."
+            "description": "已删除。"
           },
           "400": {
             "$ref": "#/components/responses/InvalidRequest"
@@ -1206,10 +1206,10 @@
         }
       },
       "get": {
-        "description": "Returns the current Thread summary, its most recent Run, and links.",
+        "description": "返回当前 Thread 摘要、最近一次 Run 和链接。",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "create thread 返回的 Thread ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1223,7 +1223,7 @@
             }
           }
         ],
-        "summary": "Retrieve Thread summary",
+        "summary": "读取 Thread 摘要",
         "responses": {
           "200": {
             "content": {
@@ -1233,7 +1233,7 @@
                 }
               }
             },
-            "description": "Thread summary."
+            "description": "Thread 摘要。"
           },
           "400": {
             "$ref": "#/components/responses/InvalidRequest"
@@ -1261,10 +1261,10 @@
     },
     "/threads/{threadId}/archive": {
       "post": {
-        "description": "Archives the Thread so it is hidden from default Thread lists.",
+        "description": "归档该 Thread，使其从默认 Thread 列表中隐藏。",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "create thread 返回的 Thread ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1283,7 +1283,7 @@
             "publicApiBearer": []
           }
         ],
-        "summary": "Archive a Thread",
+        "summary": "归档 Thread",
         "responses": {
           "200": {
             "content": {
@@ -1301,7 +1301,7 @@
                 }
               }
             },
-            "description": "Archived."
+            "description": "已归档。"
           },
           "400": {
             "$ref": "#/components/responses/InvalidRequest"
@@ -1329,10 +1329,10 @@
     },
     "/threads/{threadId}/events": {
       "get": {
-        "description": "Returns the latest public event log entries for this Thread in chronological order. This is the stable snapshot read surface for CLI and API consumers; it does not expose raw runtime payloads, transcript, or diagnostics.",
+        "description": "按时间顺序返回此 Thread 的最新公开事件日志。这是面向 CLI 和 API 使用方的稳定快照读取接口；不会暴露原始运行时 payload、转写内容或诊断信息。",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "create thread 返回的 Thread ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1346,7 +1346,7 @@
             }
           },
           {
-            "description": "Maximum number of latest Thread events to return.",
+            "description": "要返回的最新 Thread 事件数量上限。",
             "example": 100,
             "in": "query",
             "name": "limit",
@@ -1358,7 +1358,7 @@
             }
           }
         ],
-        "summary": "List Thread events",
+        "summary": "列出 Thread 事件",
         "responses": {
           "200": {
             "content": {
@@ -1368,7 +1368,7 @@
                 }
               }
             },
-            "description": "Thread event list."
+            "description": "Thread 事件列表。"
           },
           "400": {
             "$ref": "#/components/responses/InvalidRequest"
@@ -1394,10 +1394,10 @@
         }
       },
       "post": {
-        "description": "Applies a batch of events to the Thread: send user messages, answer pending permission requests, or interrupt the current Run. A user message queues a new Run when the Thread is idle.",
+        "description": "向 Thread 应用一批事件：发送用户消息、回答待处理的权限请求，或中断当前 Run。当 Thread 空闲时，用户消息会排队启动新的 Run。",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "create thread 返回的 Thread ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1411,7 +1411,7 @@
             }
           },
           {
-            "description": "Optional key for retry-safe create-thread and send-events calls. Reusing the same key with the same request returns the original response. Reusing the key while the original request is still processing returns 409.",
+            "description": "用于安全重试 create-thread 和 send-events 调用的可选键。用同一个键重复提交相同请求会返回原始响应。如果原始请求仍在处理中就重复使用该键，会返回 409。",
             "example": "thread-20260528-linear-eng-123",
             "in": "header",
             "name": "Idempotency-Key",
@@ -1444,7 +1444,7 @@
             "publicApiBearer": []
           }
         ],
-        "summary": "Send user messages, permission decisions, or interrupts to a Thread",
+        "summary": "向 Thread 发送用户消息、权限决策或中断",
         "responses": {
           "200": {
             "content": {
@@ -1454,10 +1454,10 @@
                 }
               }
             },
-            "description": "Accepted event batch.",
+            "description": "已接受事件批次。",
             "headers": {
               "Idempotency-Replayed": {
-                "description": "Present as true when this response is replayed from a previous completed request.",
+                "description": "如果此响应是从之前已完成请求中重放的，则该值为 true。",
                 "schema": {
                   "const": "true",
                   "type": "string"
@@ -1491,10 +1491,10 @@
     },
     "/threads/{threadId}/events/stream": {
       "get": {
-        "description": "Streams public Thread event log entries as Server-Sent Events. Each `thread.event` data payload uses the same ThreadEventLogEntry shape as GET /threads/{threadId}/events. The stream is for long-running consumer UX and does not expose raw runtime payloads, internal diagnostics, or private transcripts.",
+        "description": "以 Server-Sent Events 形式流式返回公开 Thread 事件日志。每个 `thread.event` data payload 都使用与 GET /threads/{threadId}/events 相同的 ThreadEventLogEntry 结构。此流用于长时间运行的消费端体验，不会暴露原始运行时 payload、内部诊断信息或私有转写内容。",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "create thread 返回的 Thread ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1508,7 +1508,7 @@
             }
           },
           {
-            "description": "Maximum number of latest Thread events to return.",
+            "description": "要返回的最新 Thread 事件数量上限。",
             "example": 100,
             "in": "query",
             "name": "limit",
@@ -1520,7 +1520,7 @@
             }
           }
         ],
-        "summary": "Stream Thread events",
+        "summary": "流式读取 Thread 事件",
         "responses": {
           "200": {
             "content": {
@@ -1531,7 +1531,7 @@
                 }
               }
             },
-            "description": "Thread event stream."
+            "description": "Thread 事件流。"
           },
           "400": {
             "$ref": "#/components/responses/InvalidRequest"
@@ -1559,10 +1559,10 @@
     },
     "/threads/{threadId}/files": {
       "get": {
-        "description": "Lists files attached to the Thread, including caller attachments and Agent artifacts.",
+        "description": "列出附加到 Thread 的文件，包括调用方附件和 Agent artifact。",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "create thread 返回的 Thread ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1581,7 +1581,7 @@
             "publicApiBearer": []
           }
         ],
-        "summary": "List Thread files",
+        "summary": "列出 Thread 文件",
         "responses": {
           "200": {
             "content": {
@@ -1604,7 +1604,7 @@
                 }
               }
             },
-            "description": "Thread file list."
+            "description": "Thread 文件列表。"
           },
           "400": {
             "$ref": "#/components/responses/InvalidRequest"
@@ -1630,10 +1630,10 @@
         }
       },
       "post": {
-        "description": "Claims a ready draft file handle into this Thread. Upload file bytes through the files data plane first, then pass the resulting fileId here.",
+        "description": "把已准备好的草稿文件句柄声明到这个 Thread 中。请先通过文件数据平面上传文件字节，然后在这里传入得到的 fileId。",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "create thread 返回的 Thread ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1665,7 +1665,7 @@
           },
           "required": true
         },
-        "summary": "Add a Thread file",
+        "summary": "添加 Thread 文件",
         "responses": {
           "201": {
             "content": {
@@ -1686,7 +1686,7 @@
                 }
               }
             },
-            "description": "Created Thread file."
+            "description": "已创建 Thread 文件。"
           },
           "400": {
             "$ref": "#/components/responses/InvalidRequest"
@@ -1714,10 +1714,10 @@
     },
     "/threads/{threadId}/files/{fileId}": {
       "delete": {
-        "description": "Detaches a file from the Thread.",
+        "description": "从 Thread 中移除文件关联。",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "create thread 返回的 Thread ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1731,7 +1731,7 @@
             }
           },
           {
-            "description": "File ID returned by add or list Thread files. v1 IDs are bare ULIDs.",
+            "description": "添加或列出 Thread 文件时返回的文件 ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J0000000000000000000000J",
             "in": "path",
             "name": "fileId",
@@ -1750,7 +1750,7 @@
             "publicApiBearer": []
           }
         ],
-        "summary": "Remove a Thread file",
+        "summary": "移除 Thread 文件",
         "responses": {
           "200": {
             "content": {
@@ -1768,7 +1768,7 @@
                 }
               }
             },
-            "description": "Removed."
+            "description": "已移除。"
           },
           "400": {
             "$ref": "#/components/responses/InvalidRequest"
@@ -1796,10 +1796,10 @@
     },
     "/threads/{threadId}/unarchive": {
       "post": {
-        "description": "Restores a previously archived Thread to active Thread lists.",
+        "description": "将之前归档的 Thread 恢复到活动 Thread 列表。",
         "parameters": [
           {
-            "description": "Thread ID returned by create thread. v1 IDs are bare ULIDs.",
+            "description": "create thread 返回的 Thread ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000009",
             "in": "path",
             "name": "threadId",
@@ -1818,7 +1818,7 @@
             "publicApiBearer": []
           }
         ],
-        "summary": "Unarchive a Thread",
+        "summary": "取消归档 Thread",
         "responses": {
           "200": {
             "content": {
@@ -1836,7 +1836,7 @@
                 }
               }
             },
-            "description": "Unarchived."
+            "description": "已取消归档。"
           },
           "400": {
             "$ref": "#/components/responses/InvalidRequest"
