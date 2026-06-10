@@ -79,6 +79,7 @@
   "The Thread's files.": "该 Thread 的文件。",
   "A single Thread file.": "单个 Thread 文件。",
   "The Thread file.": "Thread 文件。",
+  "The Thread file metadata, including its identifier, name, MIME type, and origin.": "Thread 文件的元数据，包括标识符、名称、MIME type 和来源。",
   "The account a Thread is attributed to (the API token owner).": "该 Thread 归属的账号，即 API token 所有者。",
   "Account ID (bare ULID) the Thread is attributed to.": "该 Thread 归属账号的账号 ID（不带前缀的 ULID）。",
   "The credential that created the Thread.": "创建该 Thread 的凭证。",

@@ -641,7 +641,7 @@
         "properties": {
           "file": {
             "$ref": "#/components/schemas/ThreadFile",
-            "description": "Thread 文件。"
+            "description": "Thread 文件的元数据，包括标识符、名称、MIME type 和来源。"
           }
         },
         "required": [
