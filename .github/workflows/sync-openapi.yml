@@ -46,7 +46,7 @@ jobs:
         uses: oven-sh/setup-bun@v2
 
       - name: Install Mosoo dependencies
-        run: bun install --frozen-lockfile
+        run: bun install
         working-directory: mosoo
 
       - name: Regenerate localized OpenAPI specs
