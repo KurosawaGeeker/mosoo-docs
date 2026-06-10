@@ -35,6 +35,7 @@ jobs:
           repository: langgenius/mosoo
           ref: ${{ github.event.client_payload.sha || github.event.client_payload.ref || inputs.mosoo_ref || 'main' }}
           token: ${{ secrets.MOSOO_REPO_TOKEN || github.token }}
+          submodules: recursive
           path: mosoo
 
       - name: Set up Node
