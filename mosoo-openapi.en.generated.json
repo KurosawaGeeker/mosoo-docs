@@ -706,14 +706,14 @@
       },
       "ThreadSummary": {
         "additionalProperties": false,
-        "description": "Summary of a Thread on a published Agent.",
+        "description": "Summary of a Thread on a Agent API Endpoint.",
         "properties": {
           "agent_id": {
             "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
             "format": "ulid",
             "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string",
-            "description": "ID (bare ULID) of the published Agent this Thread belongs to."
+            "description": "ID (bare ULID) of the Agent API Endpoint this Thread belongs to."
           },
           "attributed_user": {
             "description": "The account the Thread is attributed to, or null when not attributed to an account.",
@@ -750,7 +750,7 @@
             "description": "Unique Thread ID (bare ULID)."
           },
           "kind": {
-            "description": "Agent kind backing this Thread (for example a persistent or one-off published Agent).",
+            "description": "Agent kind backing this Thread (for example a persistent or one-off Agent API Endpoint).",
             "enum": [
               "pet",
               "cattle"
@@ -913,8 +913,8 @@
     }
   },
   "info": {
-    "description": "Public HTTPS API for creating and retrieving Threads on published Mosoo Agents. v1 resource identifiers are bare ULIDs, not prefixed IDs. API tokens identify the account caller. Runtime execution resolves the published Agent owner's capabilities while the Thread is attributed to the API token owner.",
-    "title": "Mosoo Published Agent API",
+    "description": "Public HTTPS API for creating and retrieving Threads on Mosoo Agent API Endpoints. v1 resource identifiers are bare ULIDs, not prefixed IDs. API tokens identify the account caller. Runtime execution resolves the Agent API Endpoint owner's capabilities while the Thread is attributed to the API token owner.",
+    "title": "Mosoo Public Thread API",
     "version": "v1"
   },
   "openapi": "3.1.0",
@@ -924,7 +924,7 @@
         "description": "Returns Threads created by the authenticated API token caller.",
         "parameters": [
           {
-            "description": "Published Agent ID from the Agent's API Access panel. v1 IDs are bare ULIDs.",
+            "description": "Agent API Endpoint ID from the Agent's API Access panel. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000001",
             "in": "path",
             "name": "agentId",
@@ -951,7 +951,7 @@
             "publicApiBearer": []
           }
         ],
-        "summary": "List Threads for a published Agent",
+        "summary": "List Threads for an Agent API Endpoint",
         "responses": {
           "200": {
             "content": {
@@ -1002,7 +1002,7 @@
         "description": "Creates a Thread and the backing AgentSession. If input is present, Mosoo also queues the initial Run. If input is omitted, the Thread is immediately visible with IDLE status and no run. API token callers are attributed to the API token owner.",
         "parameters": [
           {
-            "description": "Published Agent ID from the Agent's API Access panel. v1 IDs are bare ULIDs.",
+            "description": "Agent API Endpoint ID from the Agent's API Access panel. v1 IDs are bare ULIDs.",
             "example": "01J00000000000000000000001",
             "in": "path",
             "name": "agentId",
@@ -1077,7 +1077,7 @@
                     "input": {
                       "content": [
                         {
-                          "text": "Run this one-off published Agent Thread.",
+                          "text": "Run this one-off Public Thread API request.",
                           "type": "text"
                         }
                       ],
@@ -1093,7 +1093,7 @@
           },
           "required": false
         },
-        "summary": "Create a Thread for a published Agent",
+        "summary": "Create a Thread for an Agent API Endpoint",
         "responses": {
           "201": {
             "content": {

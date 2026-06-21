@@ -706,14 +706,14 @@
       },
       "ThreadSummary": {
         "additionalProperties": false,
-        "description": "已发布 Agent 上的 Thread 摘要。",
+        "description": "Agent API Endpoint 上的 Thread 摘要。",
         "properties": {
           "agent_id": {
             "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
             "format": "ulid",
             "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
             "type": "string",
-            "description": "此 Thread 所属已发布 Agent 的 ID（不带前缀的 ULID）。"
+            "description": "此 Thread 所属 Agent API Endpoint 的 ID（不带前缀的 ULID）。"
           },
           "attributed_user": {
             "description": "该 Thread 归属的账号；未归属到账号时为 null。",
@@ -750,7 +750,7 @@
             "description": "唯一 Thread ID（不带前缀的 ULID）。"
           },
           "kind": {
-            "description": "支撑此 Thread 的 Agent 类型，例如持久型或一次性已发布 Agent。",
+            "description": "支撑此 Thread 的 Agent 类型，例如持久型或一次性 Agent API Endpoint。",
             "enum": [
               "pet",
               "cattle"
@@ -913,8 +913,8 @@
     }
   },
   "info": {
-    "description": "用于在已发布 Mosoo Agent 上创建和读取 Thread 的公开 HTTPS API。v1 资源标识符是不带前缀的 ULID。API token 用于识别发起调用的账号。运行时执行会解析已发布 Agent 所有者的能力，同时 Thread 归属于 API token 所有者。",
-    "title": "Mosoo 已发布 Agent API",
+    "description": "用于在 Mosoo Agent API Endpoint 上创建和读取 Thread 的公开 HTTPS API。v1 资源标识符是不带前缀的 ULID。API token 用于识别发起调用的账号。运行时执行会解析 Agent API Endpoint 所有者的能力，同时 Thread 归属于 API token 所有者。",
+    "title": "Mosoo 公开 Thread API",
     "version": "v1"
   },
   "openapi": "3.1.0",
@@ -924,7 +924,7 @@
         "description": "返回由已认证 API token 调用方创建的 Thread。",
         "parameters": [
           {
-            "description": "来自 Agent API Access 面板的已发布 Agent ID。v1 ID 是不带前缀的 ULID。",
+            "description": "来自 Agent API Access 面板的 Agent API Endpoint ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000001",
             "in": "path",
             "name": "agentId",
@@ -951,7 +951,7 @@
             "publicApiBearer": []
           }
         ],
-        "summary": "列出已发布 Agent 的 Thread",
+        "summary": "列出 Agent API Endpoint 的 Thread",
         "responses": {
           "200": {
             "content": {
@@ -1002,7 +1002,7 @@
         "description": "创建 Thread 及其底层 AgentSession。如果提供 input，Mosoo 也会排队启动初始 Run。如果省略 input，Thread 会立即以 IDLE 状态可见，且没有 Run。API token 调用方会归属于 API token 所有者。",
         "parameters": [
           {
-            "description": "来自 Agent API Access 面板的已发布 Agent ID。v1 ID 是不带前缀的 ULID。",
+            "description": "来自 Agent API Access 面板的 Agent API Endpoint ID。v1 ID 是不带前缀的 ULID。",
             "example": "01J00000000000000000000001",
             "in": "path",
             "name": "agentId",
@@ -1077,7 +1077,7 @@
                     "input": {
                       "content": [
                         {
-                          "text": "Run this one-off published Agent Thread.",
+                          "text": "Run this one-off Public Thread API request.",
                           "type": "text"
                         }
                       ],
@@ -1093,7 +1093,7 @@
           },
           "required": false
         },
-        "summary": "为已发布 Agent 创建 Thread",
+        "summary": "为 Agent API Endpoint 创建 Thread",
         "responses": {
           "201": {
             "content": {

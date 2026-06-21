@@ -24,13 +24,25 @@ const GENERATED_FILES = {
 };
 const DEFAULT_ORIGIN = "https://docs.mosoo.ai";
 const MODE = process.argv[2] ?? "write";
+const MOSOO_OPENAPI_SOURCES = [
+  {
+    exportName: "createPublicApiOpenApiDocument",
+    importPath: "./apps/api/src/adapters/http/routes/public-api-openapi.ts",
+    markerPath: "apps/api/src/adapters/http/routes/public-api-openapi.ts",
+  },
+  {
+    exportName: "createPublishedAgentOpenApiDocument",
+    importPath: "./apps/api/src/adapters/http/routes/published-agent-openapi.ts",
+    markerPath: "apps/api/src/adapters/http/routes/published-agent-openapi.ts",
+  },
+];
 
 if (!["check", "write"].includes(MODE)) {
   console.error("Usage: node scripts/sync-openapi-specs.mjs [write|check]");
   process.exit(1);
 }
 
-function findMosooRepo() {
+function findMosooOpenApiSource() {
   const candidates = [
     process.env.MOSOO_REPO_DIR,
     path.join(REPO_ROOT, "..", "mosoo"),
@@ -40,27 +52,30 @@ function findMosooRepo() {
 
   for (const candidate of candidates) {
     const resolved = path.resolve(candidate);
-    if (
-      existsSync(
-        path.join(
-          resolved,
-          "apps/api/src/adapters/http/routes/published-agent-openapi.ts",
-        ),
-      )
-    ) {
-      return resolved;
+    for (const source of MOSOO_OPENAPI_SOURCES) {
+      if (existsSync(path.join(resolved, source.markerPath))) {
+        return {
+          mosooRepo: resolved,
+          source,
+        };
+      }
     }
   }
 
   throw new Error(
-    `Could not find the Mosoo repository. Set MOSOO_REPO_DIR to the local Mosoo checkout.`,
+    [
+      "Could not find the Mosoo OpenAPI source.",
+      "Set MOSOO_REPO_DIR to the local Mosoo checkout.",
+      "Checked for:",
+      ...MOSOO_OPENAPI_SOURCES.map((source) => `- ${source.markerPath}`),
+    ].join("\n"),
   );
 }
 
-function generateSourceOpenApi(mosooRepo) {
+function generateSourceOpenApi(mosooRepo, source) {
   const evalSource = `
-import { createPublishedAgentOpenApiDocument } from "./apps/api/src/adapters/http/routes/published-agent-openapi.ts";
-console.log(JSON.stringify(createPublishedAgentOpenApiDocument(${JSON.stringify(DEFAULT_ORIGIN)}), null, 2));
+import { ${source.exportName} as createOpenApiDocument } from ${JSON.stringify(source.importPath)};
+console.log(JSON.stringify(createOpenApiDocument(${JSON.stringify(DEFAULT_ORIGIN)}), null, 2));
 `;
   const result = spawnSync("bun", ["--eval", evalSource], {
     cwd: mosooRepo,
@@ -243,8 +258,8 @@ function formatJson(value) {
 }
 
 function buildOutputs() {
-  const mosooRepo = findMosooRepo();
-  const sourceDocument = generateSourceOpenApi(mosooRepo);
+  const { mosooRepo, source } = findMosooOpenApiSource();
+  const sourceDocument = generateSourceOpenApi(mosooRepo, source);
   const englishDocument = normalizeEnglishSpec(sourceDocument);
   const zhHansDocument = createLocalizedSpec(englishDocument, loadTranslations());
 
