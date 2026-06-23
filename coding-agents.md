@@ -5,17 +5,28 @@ description: "Machine-oriented guide for calling published Mosoo Agents through 
 
 # Mosoo API for coding agents
 
-Use this document when writing code that calls published Mosoo Agents.
+Use this document when integrating an existing, published Mosoo Agent into application code through the public API.
 
-## What this document is not
+## Integration scope
 
-This document is not a product overview, UI guide, Agent setup guide, or SDK reference. It starts after an Agent has already been configured and published in Mosoo.
+This document only covers API calls between application code and an existing Mosoo Agent: sending inputs, attaching files, reading outputs, and handling public API errors.
 
-This document is not the source for secrets or live resource IDs. Do not invent API tokens, `agentId`, `threadId`, `fileId`, or `runId` values. Use values supplied by the user, environment variables, Mosoo UI, or Mosoo CLI when available.
+It does not cover:
+
+- Creating, configuring, or publishing Agents.
+- Managing Mosoo Apps.
+- Managing Agent lifecycle, versions, readiness, runtime settings, model providers, tools, or channels.
+- Any other Mosoo product surface outside the public API used to pass input to an Agent and read output from it.
+
+This document is also not the source for secrets or live resource IDs. Do not invent API tokens, `agentId`, `threadId`, `fileId`, or `runId` values. Use values supplied by the user, environment variables, Mosoo UI, or Mosoo CLI when available.
 
 This document is not a replacement for the raw OpenAPI document when generating clients or validating every schema detail. Use the raw OpenAPI for code generation and strict schema validation.
 
-This document does not document private runtime internals, model provider setup, channel binding setup, Agent configuration, or debugging surfaces that are not part of the public API.
+## Integration model
+
+Mosoo is the Agent runtime. The published Agent runs inside a Mosoo-managed sandbox, and your application backend and product code should call that sandboxed Agent through the public API.
+
+Build the app-side integration layer around Mosoo Threads, events, files, and public error handling. Your application can still own backend APIs, jobs, business logic, user flows, and data storage around the sandboxed Agent. For a Mosoo Agent integration, do not implement a parallel Agent layer, sandbox, model loop, planner, tool runner, memory system, lifecycle manager, or provider integration in your application.
 
 Primary contract:
 
@@ -65,18 +76,33 @@ A valid request must pass all of these checks:
 
 Mosoo currently exposes this API as a single-user integration surface. The API token authenticates requests for that user; it does not switch users, create a multi-user access context, or let a request override model provider, channel, tool, or runtime settings. Configure and publish the Agent in Mosoo before calling the API.
 
-## Core integration flow
+## Responsibility boundary
 
-1. Create or select a published Agent in Mosoo.
-2. Read the Agent's `agentId` from its API Access panel.
-3. Create an API token in Mosoo settings.
-4. Create a Thread with `POST /agents/{agentId}/threads`.
-5. Store `thread.id` from the response.
-6. Continue the Thread with `POST /threads/{threadId}/events`.
-7. Read results from `GET /threads/{threadId}/events` or `GET /threads/{threadId}/events/stream`.
-8. Upload and attach files only when the Agent needs document or binary input.
+| Your application owns | Mosoo owns |
+| --- | --- |
+| App UI, app routing, app backend APIs, jobs, app-side users, business logic, data storage, `thread.id` persistence, and caller-owned correlation IDs such as `client_external_ref` or `clientRequestId`. | Sandboxed published Agent execution, model/provider configuration, tool execution, Agent runtime behavior, Agent memory/runtime state, and public event generation. |
 
-Use `Idempotency-Key` for retry-safe Thread creation and event submission.
+## Quick start workflow
+
+Use this workflow when implementing the quickstart in application code. It is based on the human quickstart, but it starts after the Agent already exists, is published, and has API access enabled.
+
+| Step | Call | Persist or read | Stop condition |
+| --- | --- | --- | --- |
+| 1. Load credentials | No API call. Read `MOSOO_API_TOKEN` and `MOSOO_AGENT_ID` from the user, environment, Mosoo UI, or Mosoo CLI. | Keep the token in secret storage. Keep `agentId` as configuration. | Missing token or `agentId`; do not invent either value. |
+| 2. Create a Thread | `POST /agents/{agentId}/threads` with the first user input. | Persist `thread.id`. Optionally persist `client_external_ref` for your app record. | A Thread exists and the first Run has been queued. |
+| 3. Continue the Thread | `POST /threads/{threadId}/events` with `user_message`, `permission_decision`, or `user_interrupt` events. | Persist caller-owned references such as `clientRequestId` if your app needs correlation. | The follow-up input has been accepted by the API. |
+| 4. Read output | `GET /threads/{threadId}/events` for the event log, or `GET /threads/{threadId}/events/stream` for streaming. | Read public Agent output, run status, usage updates, tool status, and file events from events. | The app has enough public events to render the Agent response or current status. |
+| 5. Attach files if needed | For small base64 payloads, `POST /threads/{threadId}/files`. For binary or larger uploads, use the file upload flow below. | Persist returned `file.id` when the app needs to reference or remove the file later. | The file is attached before sending the message that depends on it. |
+
+Implementation rules:
+
+- Build the app-side integration layer around the published Mosoo Agent running in Mosoo's sandbox; do not implement a local Agent runtime or replacement sandbox.
+- Do not call model providers directly for this Mosoo Agent integration.
+- Do not send provider credentials, model configuration, channel credentials, tool configuration, or Agent configuration through this public API.
+- Use `Idempotency-Key` for Thread creation and event submission.
+- Treat Thread events as the integration contract and `GET /threads/{threadId}/events` as the stable source for results.
+- Keep Agent creation, App management, and Agent lifecycle operations outside this workflow.
+- On failure, branch on `error.code` and follow the error handling table below.
 
 ## Minimal call sequence
 

@@ -841,6 +841,7 @@ function buildLlmsTxtOutput(englishDocument) {
     "",
     "## Notes for agents",
     "",
+    "- Build app-side backend and product logic around the published Mosoo Agent running in Mosoo's sandbox; do not implement a replacement sandbox, Agent runtime, model loop, planner, tool runner, memory system, lifecycle manager, or provider integration.",
     "- Treat Mosoo as a single-user integration surface unless the API contract says otherwise.",
     "- Do not invent API tokens, Agent IDs, Thread IDs, file IDs, or run IDs.",
     "- Prefer `coding-agents.md` for workflow and retry behavior.",
