@@ -1274,6 +1274,106 @@
       }
     },
     "/files/{fileId}/content": {
+      "get": {
+        "description": "下载已准备好的 Thread 附件或 Agent artifact 的字节内容。该文件必须属于 API token 调用方可见的公开 Thread。",
+        "parameters": [
+          {
+            "description": "添加或列出 Thread 文件时返回的文件 ID。v1 ID 是不带前缀的 ULID。",
+            "example": "01J0000000000000000000000J",
+            "in": "path",
+            "name": "fileId",
+            "required": true,
+            "schema": {
+              "example": "01J0000000000000000000000J",
+              "format": "ulid",
+              "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
+              "type": "string",
+              "x-default": "01J0000000000000000000000J"
+            }
+          },
+          {
+            "description": "控制 Content-Disposition 响应头。下载时使用 attachment，可预览内容使用 inline。",
+            "example": "attachment",
+            "in": "query",
+            "name": "disposition",
+            "schema": {
+              "default": "attachment",
+              "enum": [
+                "attachment",
+                "inline"
+              ],
+              "type": "string"
+            }
+          }
+        ],
+        "security": [
+          {
+            "publicApiBearer": []
+          }
+        ],
+        "summary": "下载 Thread 文件内容",
+        "responses": {
+          "200": {
+            "content": {
+              "application/octet-stream": {
+                "schema": {
+                  "format": "binary",
+                  "type": "string"
+                }
+              }
+            },
+            "description": "Thread 文件内容。",
+            "headers": {
+              "Cache-Control": {
+                "description": "公开 API 文件下载时设置为 no-store。",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Content-Disposition": {
+                "description": "返回文件的下载或内联展示 disposition。",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "Content-Length": {
+                "description": "文件大小，单位为字节。",
+                "schema": {
+                  "minimum": 0,
+                  "type": "integer"
+                }
+              },
+              "ETag": {
+                "description": "返回对象的存储 ETag。",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/InvalidRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthenticated"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/RateLimited"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalError"
+          }
+        }
+      },
       "put": {
         "description": "为待处理的单次 PUT Thread 文件上传上传原始字节。该文件必须已通过 POST /threads/{threadId}/files/uploads 创建，并且属于 API token 调用方可见的公开 Thread。",
         "parameters": [
