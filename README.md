@@ -40,6 +40,8 @@ The preview runs at `http://localhost:3000`.
 - `mosoo-openapi.en.generated.json` is the English OpenAPI snapshot used by the English API Reference.
 - `mosoo-openapi.zh-Hans.generated.json` is the Simplified Chinese OpenAPI snapshot used by the Chinese API Reference.
 - `mosoo-openapi.generated.json` is a compatibility copy of the English snapshot.
+- `llms.txt` is the standard LLM discovery entry point for the docs site.
+- `coding-agents.md` is the coding-agent-oriented Markdown guide. Its OpenAPI contract section is regenerated from the English OpenAPI snapshot.
 - `scripts/sync-openapi-specs.mjs` regenerates and validates the localized OpenAPI snapshots from the Mosoo source repo.
 - `scripts/openapi.zh-Hans.translations.json` stores the Simplified Chinese translations keyed by the English source text.
 - `images/` contains brand and documentation assets.
@@ -70,6 +72,8 @@ The sync script:
 - imports Mosoo's public OpenAPI document factory from the source repo;
 - normalizes public-facing token wording to `API token`;
 - generates English and Simplified Chinese OpenAPI snapshots;
+- regenerates `llms.txt` as the LLM discovery entry point;
+- regenerates the generated OpenAPI contract block in `coding-agents.md`;
 - fails if any visible `title`, `summary`, `description`, or `bearerFormat` string lacks a Chinese translation;
 - verifies the Chinese snapshot has the same non-text structure as the English snapshot.
 
