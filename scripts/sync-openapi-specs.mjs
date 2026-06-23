@@ -23,6 +23,9 @@ const GENERATED_FILES = {
   zhHans: "mosoo-openapi.zh-Hans.generated.json",
 };
 const DEFAULT_ORIGIN = "https://docs.mosoo.ai";
+const DEFAULT_MOSOO_REPO_REF = "main";
+const DEFAULT_MOSOO_REPO_URL = "https://github.com/langgenius/mosoo.git";
+const GIT_COMMAND_MAX_BUFFER = 64 * 1024 * 1024;
 const MODE = process.argv[2] ?? "write";
 const MOSOO_OPENAPI_SOURCES = [
   {
@@ -42,34 +45,149 @@ if (!["check", "write"].includes(MODE)) {
   process.exit(1);
 }
 
-function findMosooOpenApiSource() {
-  const candidates = [
-    process.env.MOSOO_REPO_DIR,
-    path.join(REPO_ROOT, "..", "mosoo"),
-    path.join(REPO_ROOT, "..", "..", "mosoo"),
-    path.join(REPO_ROOT, "mosoo"),
-  ].filter(Boolean);
+function redactSensitiveText(text) {
+  let redacted = text;
+  for (const secret of [
+    process.env.MOSOO_REPO_TOKEN,
+    process.env.GH_TOKEN,
+    process.env.GITHUB_TOKEN,
+  ]) {
+    if (typeof secret === "string" && secret.length > 0) {
+      redacted = redacted.split(secret).join("[redacted]");
+    }
+  }
 
-  for (const candidate of candidates) {
-    const resolved = path.resolve(candidate);
-    for (const source of MOSOO_OPENAPI_SOURCES) {
-      if (existsSync(path.join(resolved, source.markerPath))) {
-        return {
-          mosooRepo: resolved,
-          source,
-        };
-      }
+  return redacted.replace(
+    /https:\/\/x-access-token:[^@\s]+@github\.com\//g,
+    "https://github.com/",
+  );
+}
+
+function trimProcessOutput(output) {
+  return typeof output === "string" ? output.trim() : "";
+}
+
+function runCommand(command, args, options = {}) {
+  const { failureMessage, ...spawnOptions } = options;
+  const result = spawnSync(command, args, {
+    encoding: "utf8",
+    env: {
+      ...process.env,
+      GIT_TERMINAL_PROMPT: "0",
+    },
+    maxBuffer: GIT_COMMAND_MAX_BUFFER,
+    ...spawnOptions,
+  });
+
+  if (result.status !== 0) {
+    throw new Error(
+      [
+        failureMessage,
+        result.error?.message,
+        trimProcessOutput(result.stdout),
+        trimProcessOutput(result.stderr),
+      ]
+        .filter(Boolean)
+        .map(redactSensitiveText)
+        .join("\n"),
+    );
+  }
+
+  return result;
+}
+
+function createAuthenticatedGithubPrefix() {
+  const token = process.env.MOSOO_REPO_TOKEN;
+  if (typeof token !== "string" || token.length === 0) {
+    return null;
+  }
+
+  return `https://x-access-token:${encodeURIComponent(token)}@github.com/`;
+}
+
+function installMosooDependencies(mosooRepo) {
+  runCommand("bun", ["install"], {
+    cwd: mosooRepo,
+    failureMessage: "Failed to install Mosoo dependencies.",
+  });
+}
+
+function checkoutMosooRepoFromGit() {
+  const repoUrl = process.env.MOSOO_REPO_URL ?? DEFAULT_MOSOO_REPO_URL;
+  const repoRef = process.env.MOSOO_REPO_REF ?? DEFAULT_MOSOO_REPO_REF;
+  const checkoutDir = path.join(tmpdir(), "mosoo-openapi-sync", "mosoo");
+  rmSync(checkoutDir, { force: true, recursive: true });
+  mkdirSync(checkoutDir, { recursive: true });
+
+  runCommand("git", ["init"], {
+    cwd: checkoutDir,
+    failureMessage: "Failed to initialize Mosoo source checkout.",
+  });
+
+  const authenticatedGithubPrefix = createAuthenticatedGithubPrefix();
+  if (authenticatedGithubPrefix !== null) {
+    runCommand(
+      "git",
+      ["config", "--local", `url.${authenticatedGithubPrefix}.insteadOf`, "https://github.com/"],
+      {
+        cwd: checkoutDir,
+        failureMessage: "Failed to configure authenticated GitHub access.",
+      },
+    );
+  }
+
+  runCommand("git", ["remote", "add", "origin", repoUrl], {
+    cwd: checkoutDir,
+    failureMessage: "Failed to configure Mosoo source remote.",
+  });
+  runCommand("git", ["fetch", "--depth", "1", "origin", repoRef], {
+    cwd: checkoutDir,
+    failureMessage: `Failed to fetch Mosoo source ref ${repoRef} from ${repoUrl}.`,
+  });
+  runCommand("git", ["checkout", "--detach", "FETCH_HEAD"], {
+    cwd: checkoutDir,
+    failureMessage: "Failed to checkout Mosoo source ref.",
+  });
+  runCommand("git", ["submodule", "update", "--init", "--recursive"], {
+    cwd: checkoutDir,
+    failureMessage: "Failed to initialize Mosoo source submodules.",
+  });
+
+  const revision = runCommand("git", ["rev-parse", "HEAD"], {
+    cwd: checkoutDir,
+    failureMessage: "Failed to read Mosoo source revision.",
+  }).stdout.trim();
+  console.log(`checked out ${repoUrl} ${repoRef} (${revision.slice(0, 12)})`);
+
+  installMosooDependencies(checkoutDir);
+  return checkoutDir;
+}
+
+function findOpenApiSourceInRepo(mosooRepo) {
+  for (const source of MOSOO_OPENAPI_SOURCES) {
+    if (existsSync(path.join(mosooRepo, source.markerPath))) {
+      return {
+        mosooRepo,
+        source,
+      };
     }
   }
 
   throw new Error(
     [
-      "Could not find the Mosoo OpenAPI source.",
-      "Set MOSOO_REPO_DIR to the local Mosoo checkout.",
+      `Could not find the Mosoo OpenAPI source in ${mosooRepo}.`,
       "Checked for:",
       ...MOSOO_OPENAPI_SOURCES.map((source) => `- ${source.markerPath}`),
     ].join("\n"),
   );
+}
+
+function resolveMosooOpenApiSource() {
+  if (typeof process.env.MOSOO_REPO_DIR === "string" && process.env.MOSOO_REPO_DIR.length > 0) {
+    return findOpenApiSourceInRepo(path.resolve(process.env.MOSOO_REPO_DIR));
+  }
+
+  return findOpenApiSourceInRepo(checkoutMosooRepoFromGit());
 }
 
 function generateSourceOpenApi(mosooRepo, source) {
@@ -258,7 +376,7 @@ function formatJson(value) {
 }
 
 function buildOutputs() {
-  const { mosooRepo, source } = findMosooOpenApiSource();
+  const { mosooRepo, source } = resolveMosooOpenApiSource();
   const sourceDocument = generateSourceOpenApi(mosooRepo, source);
   const englishDocument = normalizeEnglishSpec(sourceDocument);
   const zhHansDocument = createLocalizedSpec(englishDocument, loadTranslations());

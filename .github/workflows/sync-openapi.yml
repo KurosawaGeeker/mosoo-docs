@@ -29,15 +29,6 @@ jobs:
         with:
           path: docs
 
-      - name: Checkout Mosoo source
-        uses: actions/checkout@v6
-        with:
-          repository: langgenius/mosoo
-          ref: ${{ github.event.client_payload.sha || github.event.client_payload.ref || inputs.mosoo_ref || 'main' }}
-          token: ${{ secrets.MOSOO_REPO_TOKEN || github.token }}
-          submodules: recursive
-          path: mosoo
-
       - name: Set up Node
         uses: actions/setup-node@v4
         with:
@@ -46,15 +37,12 @@ jobs:
       - name: Set up Bun
         uses: oven-sh/setup-bun@v2
 
-      - name: Install Mosoo dependencies
-        run: bun install
-        working-directory: mosoo
-
       - name: Regenerate localized OpenAPI specs
         run: npm run openapi:sync
         working-directory: docs
         env:
-          MOSOO_REPO_DIR: ${{ github.workspace }}/mosoo
+          MOSOO_REPO_REF: ${{ github.event.client_payload.sha || github.event.client_payload.ref || inputs.mosoo_ref || 'main' }}
+          MOSOO_REPO_TOKEN: ${{ secrets.MOSOO_REPO_TOKEN }}
 
       - name: Commit generated specs
         id: commit
