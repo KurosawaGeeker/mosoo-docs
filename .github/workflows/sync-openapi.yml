@@ -75,15 +75,3 @@ jobs:
         env:
           MINTLIFY_API_KEY: ${{ secrets.MINTLIFY_API_KEY }}
           MINTLIFY_PROJECT_ID: ${{ secrets.MINTLIFY_PROJECT_ID }}
-
-      - name: Trigger Netlify build hook
-        if: ${{ steps.commit.outputs.changed == 'true' }}
-        run: |
-          if [ -z "${NETLIFY_BUILD_HOOK_URL}" ]; then
-            echo "NETLIFY_BUILD_HOOK_URL is not configured; skipping."
-            exit 0
-          fi
-
-          curl --fail --request POST "${NETLIFY_BUILD_HOOK_URL}"
-        env:
-          NETLIFY_BUILD_HOOK_URL: ${{ secrets.NETLIFY_BUILD_HOOK_URL }}

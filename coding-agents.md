@@ -30,8 +30,8 @@ Build the app-side integration layer around Mosoo Threads, events, files, and pu
 
 Primary contract:
 
-- Human docs: `/`, `/quickstart`, `/auth-and-access`
-- Raw OpenAPI: `/mosoo-openapi.en.generated.json`
+- Human docs: `/docs`, `/docs/quickstart`, `/docs/auth-and-access`
+- Raw OpenAPI: `/docs/mosoo-openapi.en.generated.json`
 - API version: `v1`
 - Base URL used in examples: `https://mosoo.ai/api/v1`
 

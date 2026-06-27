@@ -30,15 +30,15 @@ description: "在你的应用中通过 API 集成并调用 Mosoo Agent。"
 ## 该怎么做？
 
 <Columns cols={3}>
-  <Card title="发布 Agent" icon="1" href="`${mosooOrigin}${publishAgentPath}`">
+  <Card title="发布 Agent" icon="1">
     在 Mosoo 中连接模型服务商，配置并发布 Agent 以获得 `agentId`。
   </Card>
 
-  <Card title="创建 API token" icon="2" href="`${mosooOrigin}${apiTokenPath}`">
+  <Card title="创建 API token" icon="2">
     在用户头像的 Settings / API tokens 中，创建代表你身份的 `API token`。
   </Card>
 
-  <Card title="创建 Thread" icon="3" href="/api-reference/create-a-thread-for-a-published-agent">
+  <Card title="创建 Thread" icon="3" href="/api-reference/create-a-thread-for-an-agent-api-endpoint">
     携带 `API token` 和 `agentId` 通过 API 创建 Thread，发送事件、文件并读取结果。
   </Card>
 </Columns>

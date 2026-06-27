@@ -2,7 +2,8 @@
 
 Documentation source for the Mosoo API docs site.
 
-- Live docs: [docs.mosoo.ai](https://docs.mosoo.ai)
+- Live docs: [mosoo.ai/docs](https://mosoo.ai/docs)
+- Landing page and blog source: [langgenius/mosoo](https://github.com/langgenius/mosoo)
 - Mosoo repository: [langgenius/mosoo](https://github.com/langgenius/mosoo)
 
 ## About
@@ -91,6 +92,5 @@ Secrets used by the sync workflow:
 
 - `MOSOO_REPO_TOKEN`: optional token for checking out a private Mosoo source repo.
 - `MINTLIFY_API_KEY` and `MINTLIFY_PROJECT_ID`: optional; triggers Mintlify's deployment API after a generated commit.
-- `NETLIFY_BUILD_HOOK_URL`: optional; triggers a Netlify build hook after a generated commit.
 
 The Mosoo source repo should include `.github/workflows/docs-openapi-dispatch.yml` and configure `MOSOO_DOCS_DISPATCH_TOKEN` with permission to dispatch workflows in `KurosawaGeeker/mosoo-docs`. That workflow listens to OpenAPI source paths and sends the current Mosoo SHA to this repo.
