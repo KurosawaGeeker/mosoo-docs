@@ -74,7 +74,8 @@ The sync script:
 - generates English and Simplified Chinese OpenAPI snapshots;
 - regenerates `llms.txt` as the LLM discovery entry point;
 - regenerates the generated OpenAPI contract block in `coding-agents.md`;
-- fails if any visible `title`, `summary`, `description`, or `bearerFormat` string lacks a Chinese translation;
+- in `sync` mode, records newly missing Simplified Chinese translation keys and uses the English source text as a non-blocking fallback until the translation is filled in;
+- in `check` mode, fails if any visible `title`, `summary`, `description`, or `bearerFormat` string lacks a completed Chinese translation;
 - verifies the Chinese snapshot has the same non-text structure as the English snapshot.
 
 Optional source controls:

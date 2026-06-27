@@ -307,7 +307,37 @@ function loadTranslations() {
   return JSON.parse(readFileSync(TRANSLATION_FILE, "utf8"));
 }
 
-function createLocalizedSpec(englishDocument, translations) {
+function formatMissingTranslationMessage(missing) {
+  const details = missing
+    .map((entry) => `${entry.pointer}\n  ${entry.value}`)
+    .join("\n\n");
+
+  return `Missing ${missing.length} zh-Hans OpenAPI translation(s).\n${details}`;
+}
+
+function seedMissingTranslationPlaceholders(translations, missing) {
+  let seeded = 0;
+
+  for (const entry of missing) {
+    if (!Object.hasOwn(translations, entry.value)) {
+      translations[entry.value] = "";
+      seeded += 1;
+    }
+  }
+
+  if (seeded > 0) {
+    writeFileSync(TRANSLATION_FILE, formatJson(translations));
+    console.warn(
+      `Seeded ${seeded} zh-Hans OpenAPI translation placeholder(s) in ${path.relative(
+        REPO_ROOT,
+        TRANSLATION_FILE,
+      )}.`,
+    );
+  }
+}
+
+function createLocalizedSpec(englishDocument, translations, options = {}) {
+  const { allowMissingFallback = false } = options;
   const document = cloneJson(englishDocument);
   const missing = [];
 
@@ -328,16 +358,16 @@ function createLocalizedSpec(englishDocument, translations) {
   });
 
   if (missing.length > 0) {
-    const details = missing
-      .map((entry) => `${entry.pointer}\n  ${entry.value}`)
-      .join("\n\n");
-    throw new Error(
-      `Missing ${missing.length} zh-Hans OpenAPI translation(s).\n${details}`,
-    );
+    if (!allowMissingFallback) {
+      throw new Error(formatMissingTranslationMessage(missing));
+    }
+
+    console.warn(formatMissingTranslationMessage(missing));
+    console.warn("Using English source text for missing zh-Hans entries in write mode.");
   }
 
   assertSameStructure(englishDocument, document);
-  return document;
+  return { document, missing };
 }
 
 function stripVisibleText(value, pointer = []) {
@@ -855,14 +885,21 @@ function buildOutputs() {
   const { mosooRepo, source } = resolveMosooOpenApiSource();
   const sourceDocument = generateSourceOpenApi(mosooRepo, source);
   const englishDocument = normalizeEnglishSpec(sourceDocument);
-  const zhHansDocument = createLocalizedSpec(englishDocument, loadTranslations());
+  const translations = loadTranslations();
+  const zhHans = createLocalizedSpec(englishDocument, translations, {
+    allowMissingFallback: MODE === "write",
+  });
+
+  if (MODE === "write" && zhHans.missing.length > 0) {
+    seedMissingTranslationPlaceholders(translations, zhHans.missing);
+  }
 
   return {
     [GENERATED_FILES.codingAgents]: buildCodingAgentsOutput(englishDocument),
     [GENERATED_FILES.en]: formatJson(englishDocument),
     [GENERATED_FILES.legacy]: formatJson(englishDocument),
     [GENERATED_FILES.llmsTxt]: buildLlmsTxtOutput(englishDocument),
-    [GENERATED_FILES.zhHans]: formatJson(zhHansDocument),
+    [GENERATED_FILES.zhHans]: formatJson(zhHans.document),
   };
 }
 

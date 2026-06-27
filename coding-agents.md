@@ -680,7 +680,7 @@ Error responses:
 
 ### `GET /threads/{threadId}/events`
 
-Purpose: Returns the latest public event log entries for this Thread in chronological order. This is the stable snapshot read surface for CLI and API consumers; it does not expose raw runtime payloads, transcript, or diagnostics.
+Purpose: Returns the latest public event log entries for this Thread in chronological order. If older public entries are omitted because the limit was reached, `truncated` is true. Event IDs are stable, so callers can retry or poll without treating the same ID as a new event. This is the stable snapshot read surface for CLI and API consumers; it does not expose raw runtime payloads, transcript, or diagnostics.
 
 Path params:
 
@@ -749,7 +749,7 @@ Error responses:
 
 ### `GET /threads/{threadId}/events/stream`
 
-Purpose: Streams public Thread event log entries as Server-Sent Events. Each `thread.event` data payload uses the same ThreadEventLogEntry shape as GET /threads/{threadId}/events. The stream is for long-running consumer UX and does not expose raw runtime payloads, internal diagnostics, or private transcripts.
+Purpose: Streams public Thread event log entries as Server-Sent Events. Each `thread.event` data payload uses the same ThreadEventLogEntry shape as GET /threads/{threadId}/events. Events are emitted by stable event ID and the stream suppresses duplicate IDs observed during polling. The stream is for long-running consumer UX and does not expose raw runtime payloads, internal diagnostics, or private transcripts.
 
 Path params:
 
@@ -766,7 +766,7 @@ Success responses:
 Example `200`:
 
 ```json
-": connected\n\nevent: thread.event\nid: 01J00000000000000000000010\ndata: {\"id\":\"01J00000000000000000000010\",\"type\":\"run.started\",\"status\":\"completed\",\"content\":\"01J0000000000000000000000A\",\"occurredAt\":\"2026-05-19T00:00:01.000Z\",\"durationMs\":null,\"tokens\":null}\n\n"
+": connected\n\nevent: thread.event\nid: 01J00000000000000000000010\ndata: {\"id\":\"01J00000000000000000000010\",\"runId\":\"01J0000000000000000000000A\",\"type\":\"run.started\",\"status\":\"available\",\"content\":\"01J0000000000000000000000A\",\"occurredAt\":\"2026-05-19T00:00:01.000Z\",\"durationMs\":null,\"tokens\":null}\n\n"
 ```
 
 Error responses:
@@ -1108,6 +1108,7 @@ Fields:
 - `durationMs` required, `integer | null`. Wall-clock duration of the event in milliseconds, when applicable (for example a completed Run). Null when not measured.
 - `id` required, `string(ulid)`. Unique event ID (bare ULID), monotonically increasing in chronological order.
 - `occurredAt` required, `string(date-time)`. Timestamp (RFC 3339) at which the event occurred.
+- `runId` required, `string(ulid) | null`. Run ID (bare ULID) associated with this event, or null when the event is not run-scoped. Use this to reconstruct output for one current Run without mixing earlier Thread output.
 - `status` required, `"available" | "error" | "unsupported"`. Delivery status of the event: `available` when the event is fully populated, `error` when it failed, `unsupported` when this event type cannot be rendered on the public surface.
 - `tokens` required, `integer | null`. Token count associated with the event when applicable (for example model usage). Null when not measured.
 - `type` required, `"agent.message.delta" | "agent.thinking.delta" | "file.changed" | "run.completed" | "run.failed" | "run.started" | "session.status" | "session_files.updated" | "tool.confirmation.required" | "tool.use.completed" | "tool.use.started" | "usage.updated" | "user.message"`. Event type, such as `run.started`, `run.completed`, `agent.message.delta`, or `tool.use.started`.
@@ -1245,11 +1246,31 @@ Fields:
 
 - `completedAt` required, `string | null(date-time)`. Timestamp (RFC 3339) at which the Run reached a terminal state, or null while it has not finished.
 - `createdAt` required, `string(date-time)`. Timestamp (RFC 3339) at which the Run was created.
+- `error` required, `RunError | null`. Structured failure summary when status is `failed`; null for successful, active, cancelled, or expired Runs.
+- `finalOutput` required, `RunFinalOutput | null`. Stable final answer for a completed Run. Mosoo builds this from that Run's public `agent.message.delta` events in chronological order. Null until the Run status is `completed`.
 - `id` required, `string(ulid)`. Unique Run ID (bare ULID).
 - `startedAt` required, `string | null(date-time)`. Timestamp (RFC 3339) at which the Run began executing, or null while it is still queued.
-- `status` required, `"queued" | "booting" | "running" | "waiting_input" | "completed" | "failed" | "cancelled" | "expired"`. Current Run status. `queued` and `booting` precede execution; `running` and `waiting_input` are active; `completed`, `failed`, `cancelled`, and `expired` are terminal.
+- `status` required, `"queued" | "booting" | "running" | "waiting_input" | "completed" | "failed" | "cancelled" | "expired"`. Current Run status. `queued` and `booting` precede execution; `running` and `waiting_input` are active; `completed`, `failed`, `cancelled`, `expired` are terminal.
 - `trigger` required, `"user_prompt" | "retry" | "resume" | "system"`. What started the Run: `user_prompt` (a user message), `retry`, `resume`, or `system`.
 - `updatedAt` required, `string(date-time)`. Timestamp (RFC 3339) of the most recent change to the Run.
+
+### `RunError`
+
+Public-safe Run failure summary exposed on failed public Runs.
+
+Fields:
+
+- `code` required, `string`. Stable, machine-readable failure code.
+- `message` required, `string`. Human-readable failure summary.
+- `retryable` required, `boolean`. Whether retrying the Run may succeed without changing input.
+
+### `RunFinalOutput`
+
+Final assistant answer for a completed public Thread Run.
+
+Fields:
+
+- `text` required, `string`. Text reconstructed from the current Run's public `agent.message.delta` events in chronological order.
 
 ### `UserWarning`
 

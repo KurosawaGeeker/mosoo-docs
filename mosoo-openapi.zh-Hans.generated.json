@@ -585,6 +585,20 @@
             "format": "date-time",
             "type": "string"
           },
+          "runId": {
+            "description": "与此事件关联的 Run ID（不带前缀的 ULID）。如果事件不属于某个 Run，则为 null。可用它重建当前单个 Run 的输出，避免混入较早的 Thread 输出。",
+            "oneOf": [
+              {
+                "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
+                "format": "ulid",
+                "pattern": "^[0-7][0-9A-HJKMNP-TV-Za-hjkmnp-tv-z]{25}$",
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "status": {
             "description": "事件交付状态：`available` 表示事件内容完整；`error` 表示事件失败；`unsupported` 表示该事件类型不能在公开接口上渲染。",
             "enum": [
@@ -624,6 +638,7 @@
           "durationMs",
           "id",
           "occurredAt",
+          "runId",
           "status",
           "tokens",
           "type"
@@ -1095,6 +1110,28 @@
             "format": "date-time",
             "type": "string"
           },
+          "error": {
+            "description": "当状态为 `failed` 时返回结构化失败摘要；成功、活动中、已取消或已过期的 Run 返回 null。",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RunError"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "finalOutput": {
+            "description": "已完成 Run 的稳定最终答案。Mosoo 会按时间顺序从该 Run 的公开 `agent.message.delta` 事件构建此内容。Run 状态变为 `completed` 前为 null。",
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/RunFinalOutput"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
           "id": {
             "example": "01ARZ3NDEKTSV4RRFFQ69G5FAV",
             "format": "ulid",
@@ -1111,7 +1148,7 @@
             ]
           },
           "status": {
-            "description": "当前 Run 状态。`queued` 和 `booting` 发生在执行前；`running` 和 `waiting_input` 表示处于活动状态；`completed`、`failed`、`cancelled` 和 `expired` 是终态。",
+            "description": "当前 Run 状态。`queued` 和 `booting` 发生在执行前；`running` 和 `waiting_input` 表示处于活动状态；`completed`、`failed`、`cancelled`、`expired` 是终态。",
             "enum": [
               "queued",
               "booting",
@@ -1141,11 +1178,53 @@
         "required": [
           "completedAt",
           "createdAt",
+          "error",
+          "finalOutput",
           "id",
           "startedAt",
           "status",
           "trigger",
           "updatedAt"
+        ],
+        "type": "object"
+      },
+      "RunError": {
+        "additionalProperties": false,
+        "description": "失败的公开 Run 暴露的公开安全失败摘要。",
+        "properties": {
+          "code": {
+            "description": "稳定的、机器可读的失败代码。",
+            "minLength": 1,
+            "type": "string"
+          },
+          "message": {
+            "description": "便于阅读的失败摘要。",
+            "minLength": 1,
+            "type": "string"
+          },
+          "retryable": {
+            "description": "在不改变输入的情况下，重试该 Run 是否可能成功。",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "retryable"
+        ],
+        "type": "object"
+      },
+      "RunFinalOutput": {
+        "additionalProperties": false,
+        "description": "已完成公开 Thread Run 的最终助手答案。",
+        "properties": {
+          "text": {
+            "description": "按时间顺序从当前 Run 的公开 `agent.message.delta` 事件重建出的文本。",
+            "type": "string"
+          }
+        },
+        "required": [
+          "text"
         ],
         "type": "object"
       },
@@ -1863,7 +1942,7 @@
     },
     "/threads/{threadId}/events": {
       "get": {
-        "description": "按时间顺序返回此 Thread 的最新公开事件日志。这是面向 CLI 和 API 使用方的稳定快照读取接口；不会暴露原始运行时 payload、转写内容或诊断信息。",
+        "description": "按时间顺序返回此 Thread 的最新公开事件日志条目。如果因为达到上限而省略了更早的公开条目，`truncated` 会为 true。事件 ID 是稳定的，因此调用方可以重试或轮询，而不会把同一个 ID 当作新事件处理。这是面向 CLI 和 API 使用方的稳定快照读取接口；不会暴露原始运行时 payload、转写内容或诊断信息。",
         "parameters": [
           {
             "description": "create thread 返回的 Thread ID。v1 ID 是不带前缀的 ULID。",
@@ -2025,7 +2104,7 @@
     },
     "/threads/{threadId}/events/stream": {
       "get": {
-        "description": "以 Server-Sent Events 形式流式返回公开 Thread 事件日志。每个 `thread.event` data payload 都使用与 GET /threads/{threadId}/events 相同的 ThreadEventLogEntry 结构。此流用于长时间运行的消费端体验，不会暴露原始运行时 payload、内部诊断信息或私有转写内容。",
+        "description": "以 Server-Sent Events 形式流式返回公开 Thread 事件日志条目。每个 `thread.event` data payload 都使用与 GET /threads/{threadId}/events 相同的 ThreadEventLogEntry 结构。事件按稳定事件 ID 发出，流会抑制轮询期间观察到的重复 ID。此流用于长时间运行的消费端体验，不会暴露原始运行时 payload、内部诊断信息或私有转写内容。",
         "parameters": [
           {
             "description": "create thread 返回的 Thread ID。v1 ID 是不带前缀的 ULID。",
@@ -2059,7 +2138,7 @@
           "200": {
             "content": {
               "text/event-stream": {
-                "example": ": connected\n\nevent: thread.event\nid: 01J00000000000000000000010\ndata: {\"id\":\"01J00000000000000000000010\",\"type\":\"run.started\",\"status\":\"completed\",\"content\":\"01J0000000000000000000000A\",\"occurredAt\":\"2026-05-19T00:00:01.000Z\",\"durationMs\":null,\"tokens\":null}\n\n",
+                "example": ": connected\n\nevent: thread.event\nid: 01J00000000000000000000010\ndata: {\"id\":\"01J00000000000000000000010\",\"runId\":\"01J0000000000000000000000A\",\"type\":\"run.started\",\"status\":\"available\",\"content\":\"01J0000000000000000000000A\",\"occurredAt\":\"2026-05-19T00:00:01.000Z\",\"durationMs\":null,\"tokens\":null}\n\n",
                 "schema": {
                   "type": "string"
                 }
