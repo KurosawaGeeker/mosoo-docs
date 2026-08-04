@@ -538,7 +538,7 @@ Error responses:
 
 ### `POST /agents/{agentId}/threads`
 
-Purpose: Creates a Thread and the backing AgentSession. If input is present, mosoo also queues the initial Run. If input is omitted, the Thread is immediately visible with IDLE status and no run. API token requests are attributed to the current Mosoo user.
+Purpose: Creates a Thread and the backing AgentSession for the required application `userId`. If input is present, mosoo also queues the initial Run. If input is omitted, the Thread is immediately visible with IDLE status and no run.
 
 Path params:
 
@@ -556,7 +556,7 @@ Example `emptyThread`:
 
 ```json
 {
-  "client_external_ref": "draft-empty-thread"
+  "userId": "customer-123"
 }
 ```
 
@@ -564,7 +564,6 @@ Example `accessTokenWithFile`:
 
 ```json
 {
-  "client_external_ref": "linear-ENG-123",
   "input": {
     "content": [
       {
@@ -579,7 +578,8 @@ Example `accessTokenWithFile`:
       "file_id": "01J0000000000000000000000J",
       "type": "file"
     }
-  ]
+  ],
+  "userId": "customer-123"
 }
 ```
 
@@ -587,7 +587,6 @@ Example `accessTokenBasic`:
 
 ```json
 {
-  "client_external_ref": "demo-thread-001",
   "input": {
     "content": [
       {
@@ -596,7 +595,8 @@ Example `accessTokenBasic`:
       }
     ],
     "type": "user.message"
-  }
+  },
+  "userId": "customer-123"
 }
 ```
 
@@ -612,7 +612,8 @@ Example `cattleAgentSameShape`:
       }
     ],
     "type": "user.message"
-  }
+  },
+  "userId": "automation"
 }
 ```
 
@@ -892,7 +893,7 @@ Variants:
 
 1. `object`: Send a new user message into the Thread, optionally with file attachments.
    - `resources` optional, `FileResource[]`. Files to attach to this message. Each file must be a ready draft file uploaded through the Agent file endpoint by the same API token.
-   - `clientRequestId` optional, `string | null`. Optional caller-supplied correlation ID echoed back on the matching event result so you can pair responses with the message you sent.
+   - `requestId` optional, `string | null`. Optional caller-supplied request ID echoed back on the matching event result so you can pair responses with the message you sent.
    - `text` required, `string`. The user message text. Must not be empty.
    - `type` required, `"user_message"`. Discriminator selecting the send-user-message variant.
 
@@ -993,17 +994,17 @@ Outcome of a single submitted event.
 
 Fields:
 
-- `clientRequestId` required, `string | null`. The `clientRequestId` echoed from the submitted user message, or null when none was provided or the event type does not carry one.
+- `requestId` required, `string | null`. The `requestId` echoed from the submitted user message, or null when none was provided or the event type does not carry one.
 - `run` required, `RunSummary | null`. The Run created or affected by this event, or null when the event did not start or change a Run.
 - `type` required, `"permission_decision" | "user_interrupt" | "user_message"`. The kind of event this result corresponds to.
 
 ### `CreateThreadRequest`
 
-Request body for creating a Thread. All fields are optional: omit `input` to create an empty IDLE Thread, or include it to queue the initial Run.
+Request body for creating a Thread. `userId` is required. Omit `input` to create an empty IDLE Thread, or include it to queue the initial Run.
 
 Fields:
 
-- `client_external_ref` optional, `string`. Optional client-owned reference (for example an external ticket key) stored on the Thread for correlation. Not unique and not validated by mosoo.
+- `userId` required, `string`. Opaque application-user identifier supplied by the trusted backend. It is immutable for the lifetime of the Thread and is delegated to MCP servers during Runs.
 - `resources` optional, `FileResource[]`. Files uploaded through the Agent file endpoint and mounted into the first Run.
 - `input` optional, `object`. Initial user message that seeds the Thread and queues the first Run. Omit to create an empty Thread with no run.
   - `content` required, `object[]`. Ordered content parts that make up the initial message.
@@ -1059,23 +1060,6 @@ Fields:
 
 - `file` required, `ThreadFile`. The Thread file metadata, including its identifier, name, MIME type, and origin.
 
-### `ThreadAttributedUser`
-
-The account a Thread is attributed to (the current Mosoo user).
-
-Fields:
-
-- `id` required, `string(ulid)`. Account ID (bare ULID) the Thread is attributed to.
-
-### `ThreadCaller`
-
-The credential that created the Thread.
-
-Fields:
-
-- `id` required, `string(ulid)`. ID (bare ULID) of the caller that created the Thread.
-- `kind` required, `"access_token"`. Caller credential type. `access_token` identifies an API token.
-
 ### `ThreadLinks`
 
 Convenience links for a Thread.
@@ -1091,10 +1075,7 @@ Summary of a Thread on a Agent API Endpoint.
 Fields:
 
 - `agent_id` required, `string(ulid)`. ID (bare ULID) of the Agent API Endpoint this Thread belongs to.
-- `attributed_user` required, `ThreadAttributedUser | null`. The account the Thread is attributed to, or null when not attributed to an account.
-- `client_external_ref` required, `string | null`. The client-owned reference supplied at creation, or null when none was provided.
 - `created_at` required, `string(date-time)`. Timestamp (RFC 3339) at which the Thread was created.
-- `created_by` required, `ThreadCaller`. The credential that created the Thread.
 - `id` required, `string(ulid)`. Unique Thread ID (bare ULID).
 - `kind` required, `"pet" | "cattle"`. Agent kind backing this Thread (for example a persistent or one-off Agent API Endpoint).
 - `last_run_id` required, `string(ulid) | null`. ID (bare ULID) of the most recent Run, or null when no Run exists yet.
@@ -1102,6 +1083,7 @@ Fields:
 - `status` required, `"IDLE" | "RUNNING" | "RESCHEDULING" | "TERMINATED"`. Lifecycle status of the Thread: `IDLE` (no active run), `RUNNING` (a Run is executing), `RESCHEDULING` (between runs), or `TERMINATED` (ended).
 - `title` required, `string | null`. Human-readable Thread title, or null when one has not been derived yet.
 - `updated_at` required, `string(date-time)`. Timestamp (RFC 3339) of the most recent change to the Thread.
+- `userId` required, `string`. Immutable opaque application-user identifier supplied when the Thread was created.
 
 ### `RunSummary`
 

@@ -260,5 +260,11 @@
   "mosoo API token": "",
   "Public HTTPS API for creating and retrieving Threads on mosoo Agent API Endpoints. v1 resource identifiers are bare ULIDs, not prefixed IDs. API tokens identify the account caller. Runtime execution resolves the Agent API Endpoint owner's capabilities while the Thread is attributed to the API token owner.": "",
   "mosoo Public Thread API": "",
-  "Creates a Thread and the backing AgentSession. If input is present, mosoo also queues the initial Run. If input is omitted, the Thread is immediately visible with IDLE status and no run. API token callers are attributed to the API token owner.": ""
+  "Creates a Thread and the backing AgentSession. If input is present, mosoo also queues the initial Run. If input is omitted, the Thread is immediately visible with IDLE status and no run. API token callers are attributed to the API token owner.": "",
+  "Optional caller-supplied request ID echoed back on the matching event result so you can pair responses with the message you sent.": "",
+  "The `requestId` echoed from the submitted user message, or null when none was provided or the event type does not carry one.": "",
+  "Request body for creating a Thread. `userId` is required. Omit `input` to create an empty IDLE Thread, or include it to queue the initial Run.": "",
+  "Opaque application-user identifier supplied by the trusted backend. It is immutable for the lifetime of the Thread and is delegated to MCP servers during Runs.": "",
+  "Immutable opaque application-user identifier supplied when the Thread was created.": "",
+  "Creates a Thread and the backing AgentSession for the required application `userId`. If input is present, mosoo also queues the initial Run. If input is omitted, the Thread is immediately visible with IDLE status and no run.": ""
 }
