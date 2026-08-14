@@ -976,6 +976,9 @@ Fields:
 - `occurredAt` required, `string(date-time)`. Timestamp (RFC 3339) at which the event occurred.
 - `runId` required, `string(ulid) | null`. Run ID (bare ULID) associated with this event, or null when the event is not run-scoped. Use this to reconstruct output for one current Run without mixing earlier Thread output.
 - `status` required, `"available" | "error" | "unsupported"`. Delivery status of the event: `available` when the event is fully populated, `error` when it failed, `unsupported` when this event type cannot be rendered on the public surface.
+- `toolCallId` optional, `string`. Opaque, durable ID shared by lifecycle events for one logical tool invocation. Use this value, not the event `id`, to correlate start, confirmation, and terminal events.
+- `toolInput` optional, `object`. Structured tool arguments when this event carries a complete canonical input object.
+- `toolName` optional, `string`. Harness-neutral tool name when supplied by the runtime.
 - `tokens` required, `integer | null`. Token count associated with the event when applicable (for example model usage). Null when not measured.
 - `type` required, `"agent.message.delta" | "agent.thinking.delta" | "file.changed" | "run.completed" | "run.failed" | "run.started" | "session.status" | "session_files.updated" | "tool.confirmation.required" | "tool.use.completed" | "tool.use.started" | "usage.updated" | "user.message"`. Event type, such as `run.started`, `run.completed`, `agent.message.delta`, or `tool.use.started`.
 
