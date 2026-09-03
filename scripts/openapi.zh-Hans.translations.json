@@ -269,5 +269,6 @@
   "Creates a Thread and the backing AgentSession for the required application `userId`. If input is present, mosoo also queues the initial Run. If input is omitted, the Thread is immediately visible with IDLE status and no run.": "",
   "Opaque, durable ID shared by lifecycle events for one logical tool invocation. Use this value, not the event `id`, to correlate start, confirmation, and terminal events.": "",
   "Structured tool arguments when this event carries a complete canonical input object.": "",
-  "Harness-neutral tool name when supplied by the runtime.": ""
+  "Harness-neutral tool name when supplied by the runtime.": "",
+  "Uploads a file into the Agent API Endpoint's Project draft scope before a Thread exists. Use the returned file ID in create-thread or send-events resources.": ""
 }

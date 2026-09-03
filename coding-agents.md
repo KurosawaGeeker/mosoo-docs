@@ -388,7 +388,7 @@ Common error response envelope:
 
 ### `POST /agents/{agentId}/files`
 
-Purpose: Uploads a file into the Agent API Endpoint's App draft scope before a Thread exists. Use the returned file ID in create-thread or send-events resources.
+Purpose: Uploads a file into the Agent API Endpoint's Project draft scope before a Thread exists. Use the returned file ID in create-thread or send-events resources.
 
 Path params:
 
