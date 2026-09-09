@@ -1015,7 +1015,7 @@
     "securitySchemes": {
       "publicApiBearer": {
         "bearerFormat": "mosoo API token",
-        "description": "使用 Authorization: Bearer mst_...。API token 用于识别账号，不携带 scope。",
+        "description": "Use Authorization: Bearer msp_... . Project API keys can configure Agents, execute Sessions, and access files only in their Project. Key and account management require console or CLI login. Legacy account tokens are rejected.",
         "scheme": "bearer",
         "type": "http"
       }

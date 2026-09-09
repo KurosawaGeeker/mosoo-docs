@@ -270,5 +270,6 @@
   "Opaque, durable ID shared by lifecycle events for one logical tool invocation. Use this value, not the event `id`, to correlate start, confirmation, and terminal events.": "",
   "Structured tool arguments when this event carries a complete canonical input object.": "",
   "Harness-neutral tool name when supplied by the runtime.": "",
-  "Uploads a file into the Agent API Endpoint's Project draft scope before a Thread exists. Use the returned file ID in create-thread or send-events resources.": ""
+  "Uploads a file into the Agent API Endpoint's Project draft scope before a Thread exists. Use the returned file ID in create-thread or send-events resources.": "",
+  "Use Authorization: Bearer msp_... . Project API keys can configure Agents, execute Sessions, and access files only in their Project. Key and account management require console or CLI login. Legacy account tokens are rejected.": ""
 }
