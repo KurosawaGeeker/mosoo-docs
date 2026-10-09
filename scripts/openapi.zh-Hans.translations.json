@@ -271,5 +271,18 @@
   "Structured tool arguments when this event carries a complete canonical input object.": "",
   "Harness-neutral tool name when supplied by the runtime.": "",
   "Uploads a file into the Agent API Endpoint's Project draft scope before a Thread exists. Use the returned file ID in create-thread or send-events resources.": "",
-  "Use Authorization: Bearer msp_... . Project API keys can configure Agents, execute Sessions, and access files only in their Project. Key and account management require console or CLI login. Legacy account tokens are rejected.": ""
+  "Use Authorization: Bearer msp_... . Project API keys can configure Agents, execute Sessions, and access files only in their Project. Key and account management require console or CLI login. Legacy account tokens are rejected.": "",
+  "Create a durable Thread from the latest saved private Agent configuration. userId is optional; omit input for an idle Thread. Existing Threads retain their admitted configuration.": "",
+  "Optional saved Agent preset provenance. Null for a Session created with inline execution configuration.": "",
+  "Public API response marker; does not indicate the Session's creation channel.": "",
+  "The original application user identity, or null when none was supplied. Never replaced with an invented identity.": "",
+  "Choose inline execution or an owned Agent preset explicitly. The two sources cannot be combined; admitted configuration is frozen for the Session.": "",
+  "Supported runtime catalog ID, such as openai-runtime or claude-agent-sdk.": "",
+  "Create a Project-owned durable Session with inline configuration or an optional saved Agent preset. No Agent is created for inline execution. Model credentials must already be configured in this Project.": "",
+  "Project draft files to attach to this Session and mount for execution.": "",
+  "Persisted runtime usage observations in ID order. Null means unreported, not zero. Token conventions follow usageContract; reported costs are runtime estimates, not a settled bill. Poll again to observe updates to in-progress calls.": "",
+  "Pass as after to read the next page, or null on the final page.": "",
+  "anthropic_bucketed input excludes cache buckets; openai_total_with_cached_breakdown and openai_runtime_total_with_cached_breakdown include cache reads in input. Unknown remains null; do not infer it from the model name.": "",
+  "Project-owned durable Sessions with direct harness/model/instructions input and optional saved Agent presets. No Agent is required for direct execution. The returned Thread ID remains the conversation handle for reading, continuing, cancelling, and downloading files. Project model credentials are required; v1 retains its existing admission and published-configuration behavior.": "",
+  "Creates a durable Thread from the latest saved private Agent. Publishing and userId are not required. Input and files are optional. The admitted configuration is frozen for this Thread; subsequent Agent edits affect only new Threads.": ""
 }

@@ -538,7 +538,7 @@ Error responses:
 
 ### `POST /agents/{agentId}/threads`
 
-Purpose: Creates a Thread and the backing AgentSession for the required application `userId`. If input is present, mosoo also queues the initial Run. If input is omitted, the Thread is immediately visible with IDLE status and no run.
+Purpose: Creates a durable Thread from the latest saved private Agent. Publishing and userId are not required. Input and files are optional. The admitted configuration is frozen for this Thread; subsequent Agent edits affect only new Threads.
 
 Path params:
 
@@ -555,9 +555,7 @@ Request body:
 Example `emptyThread`:
 
 ```json
-{
-  "userId": "customer-123"
-}
+{}
 ```
 
 Example `accessTokenWithFile`:
@@ -597,23 +595,6 @@ Example `accessTokenBasic`:
     "type": "user.message"
   },
   "userId": "customer-123"
-}
-```
-
-Example `cattleAgentSameShape`:
-
-```json
-{
-  "input": {
-    "content": [
-      {
-        "text": "Run this one-off Public Thread API request.",
-        "type": "text"
-      }
-    ],
-    "type": "user.message"
-  },
-  "userId": "automation"
 }
 ```
 
@@ -1003,11 +984,11 @@ Fields:
 
 ### `CreateThreadRequest`
 
-Request body for creating a Thread. `userId` is required. Omit `input` to create an empty IDLE Thread, or include it to queue the initial Run.
+Create a durable Thread from the latest saved private Agent configuration. userId is optional; omit input for an idle Thread. Existing Threads retain their admitted configuration.
 
 Fields:
 
-- `userId` required, `string`. Opaque application-user identifier supplied by the trusted backend. It is immutable for the lifetime of the Thread and is delegated to MCP servers during Runs.
+- `userId` optional, `string`. Opaque application-user identifier supplied by the trusted backend. It is immutable for the lifetime of the Thread and is delegated to MCP servers during Runs.
 - `resources` optional, `FileResource[]`. Files uploaded through the Agent file endpoint and mounted into the first Run.
 - `input` optional, `object`. Initial user message that seeds the Thread and queues the first Run. Omit to create an empty Thread with no run.
   - `content` required, `object[]`. Ordered content parts that make up the initial message.
@@ -1077,16 +1058,15 @@ Summary of a Thread on a Agent API Endpoint.
 
 Fields:
 
-- `agent_id` required, `string(ulid)`. ID (bare ULID) of the Agent API Endpoint this Thread belongs to.
+- `agent_id` required, `string | null(ulid)`. Optional saved Agent preset provenance. Null for a Session created with inline execution configuration.
 - `created_at` required, `string(date-time)`. Timestamp (RFC 3339) at which the Thread was created.
 - `id` required, `string(ulid)`. Unique Thread ID (bare ULID).
-- `kind` required, `"pet" | "cattle"`. Agent kind backing this Thread (for example a persistent or one-off Agent API Endpoint).
 - `last_run_id` required, `string(ulid) | null`. ID (bare ULID) of the most recent Run, or null when no Run exists yet.
-- `source` required, `"api"`. Origin of the Thread. Always `api` for Threads created via this API.
+- `source` required, `"api"`. Public API response marker; does not indicate the Session's creation channel.
 - `status` required, `"IDLE" | "RUNNING" | "RESCHEDULING" | "TERMINATED"`. Lifecycle status of the Thread: `IDLE` (no active run), `RUNNING` (a Run is executing), `RESCHEDULING` (between runs), or `TERMINATED` (ended).
 - `title` required, `string | null`. Human-readable Thread title, or null when one has not been derived yet.
 - `updated_at` required, `string(date-time)`. Timestamp (RFC 3339) of the most recent change to the Thread.
-- `userId` required, `string`. Immutable opaque application-user identifier supplied when the Thread was created.
+- `userId` required, `string | null`. The original application user identity, or null when none was supplied. Never replaced with an invented identity.
 
 ### `RunSummary`
 
@@ -1140,6 +1120,45 @@ Fields:
 
 - `code` required, `string`. Stable, machine-readable warning code.
 - `message` required, `string`. Human-readable explanation of the warning.
+
+### `ThreadConfiguration`
+
+Choose inline execution or an owned Agent preset explicitly. The two sources cannot be combined; admitted configuration is frozen for the Session.
+
+Variants:
+
+1. `object`
+   - `type` required, `"inline"`.
+   - `harness` required, `string`. Supported runtime catalog ID, such as openai-runtime or claude-agent-sdk.
+   - `provider` required, `string`.
+   - `model` required, `string`.
+   - `instructions` required, `string`.
+
+2. `object`
+   - `type` required, `"agent"`.
+   - `agent_id` required, `string(ulid)`.
+
+### `CreateProjectThreadRequest`
+
+Create a Project-owned durable Session with inline configuration or an optional saved Agent preset. No Agent is created for inline execution. Model credentials must already be configured in this Project.
+
+Fields:
+
+- `userId` optional, `string`. Opaque application-user identifier supplied by the trusted backend. It is immutable for the lifetime of the Thread and is delegated to MCP servers during Runs.
+- `resources` optional, `FileResource[]`. Project draft files to attach to this Session and mount for execution.
+- `input` optional, `object`. Initial user message that seeds the Thread and queues the first Run. Omit to create an empty Thread with no run.
+  - `content` required, `object[]`. Ordered content parts that make up the initial message.
+  - `type` required, `"user.message"`. Discriminator for the initial input. Always `user.message`.
+- `configuration` required, `ThreadConfiguration`.
+
+### `ThreadUsageResponse`
+
+Persisted runtime usage observations in ID order. Null means unreported, not zero. Token conventions follow usageContract; reported costs are runtime estimates, not a settled bill. Poll again to observe updates to in-progress calls.
+
+Fields:
+
+- `nextCursor` required, `string | null`. Pass as after to read the next page, or null on the final page.
+- `usage` required, `object[]`.
 {/* END GENERATED OPENAPI REFERENCE */}
 ## Implementation guardrails for coding agents
 
