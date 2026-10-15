@@ -284,5 +284,6 @@
   "Pass as after to read the next page, or null on the final page.": "",
   "anthropic_bucketed input excludes cache buckets; openai_total_with_cached_breakdown and openai_runtime_total_with_cached_breakdown include cache reads in input. Unknown remains null; do not infer it from the model name.": "",
   "Project-owned durable Sessions with direct harness/model/instructions input and optional saved Agent presets. No Agent is required for direct execution. The returned Thread ID remains the conversation handle for reading, continuing, cancelling, and downloading files. Project model credentials are required; v1 retains its existing admission and published-configuration behavior.": "",
-  "Creates a durable Thread from the latest saved private Agent. Publishing and userId are not required. Input and files are optional. The admitted configuration is frozen for this Thread; subsequent Agent edits affect only new Threads.": ""
+  "Creates a durable Thread from the latest saved private Agent. Publishing and userId are not required. Input and files are optional. The admitted configuration is frozen for this Thread; subsequent Agent edits affect only new Threads.": "",
+  "True when older events exist beyond the returned window because the requested event limit or the history read budget was reached.": ""
 }

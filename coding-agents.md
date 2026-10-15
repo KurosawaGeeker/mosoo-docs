@@ -970,7 +970,7 @@ A page of the latest Thread event log entries in chronological order.
 Fields:
 
 - `events` required, `ThreadEventLogEntry[]`. The returned event log entries, oldest first within the requested window.
-- `truncated` required, `boolean`. True when older events exist beyond the returned window because the requested limit was reached.
+- `truncated` required, `boolean`. True when older events exist beyond the returned window because the requested event limit or the history read budget was reached.
 
 ### `ThreadEventResult`
 
